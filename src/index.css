@@ -24,6 +24,10 @@ body {
   box-sizing: border-box;
 }
 
+p {
+  font-size: unset;
+}
+
 html,
 body,
 #__next {
@@ -105,6 +109,10 @@ body,
 }
 .hidden-sm {
   display: none;
+}
+
+#userImage {
+  max-width: 300px;
 }
 
 @media only screen and (min-width: 33.75em) {
