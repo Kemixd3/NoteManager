@@ -61,22 +61,17 @@ const Account = ({ user }) => {
 
   function DocxParser() {
     const [parsedData, setParsedData] = useState(null);
+    const [editable, setEditable] = useState(false);
 
     const parseWordDocxFile = (event) => {
       const file = event.target.files[0];
       if (!file) return;
-
+      setLoading(true);
       const reader = new FileReader();
       reader.onloadend = async () => {
         const arrayBuffer = reader.result;
         console.log(arrayBuffer);
         const htmlResult = await mammoth.convertToHtml({
-          arrayBuffer: arrayBuffer,
-        });
-        const rawTextResult = await mammoth.extractRawText({
-          arrayBuffer: arrayBuffer,
-        });
-        const markdownResult = await mammoth.convertToMarkdown({
           arrayBuffer: arrayBuffer,
         });
 
@@ -87,18 +82,18 @@ const Account = ({ user }) => {
         // Update the state with the parsed data
         setParsedData({
           html: htmlResult.value,
-          rawText: rawTextResult.value,
-          markdown: markdownResult.value,
+
           //kage: html,
         });
       };
       reader.readAsArrayBuffer(file);
+      setLoading(false);
     };
 
     return (
       <div aria-live="polite">
         {loading ? (
-          "Saving ..."
+          "Loading ..."
         ) : (
           <form onSubmit={updateProfile} className="form-widget">
             <div>Email: {user.email}</div>
@@ -139,15 +134,24 @@ const Account = ({ user }) => {
               <div>
                 <h3>HTML Content:</h3>
                 {console.log("THIS", parsedData.html)}
-                <div dangerouslySetInnerHTML={{ __html: parsedData.html }} />
-              </div>
-              <div>
-                <h3>Raw Text:</h3>
-                <pre>{parsedData.rawText}</pre>
-              </div>
-              <div>
-                <h3>Markdown Content:</h3>
-                <pre>{parsedData.markdown}</pre>
+                <div
+                  dangerouslySetInnerHTML={{ __html: parsedData.html }}
+                  contentEditable={editable} // Make it editable
+                  onInput={(e) => {
+                    // Update the parsedData.html when the content changes
+                    setParsedData((prevState) => ({
+                      ...prevState,
+                      html: e.target.innerHTML,
+                    }));
+                  }}
+                />
+
+                <button
+                  onClick={() => setEditable(!editable)}
+                  disabled={loading}
+                >
+                  Toggle Editable
+                </button>
               </div>
             </div>
           )}
