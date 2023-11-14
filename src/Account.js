@@ -3,7 +3,7 @@ import { collection, getDoc, doc, setDoc } from "firebase/firestore";
 
 import { auth, firestore } from "./firebaseClient";
 
-const Account = ({ user }) => {
+const Account = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
   const [website, setWebsite] = useState(null);
@@ -59,6 +59,15 @@ const Account = ({ user }) => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      //onLogout(); //TODO make callback function to handle logout in parent component
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <div aria-live="polite">
       {loading ? (
@@ -95,6 +104,9 @@ const Account = ({ user }) => {
           </div>
         </form>
       )}
+      <button onClick={handleLogout} className="button secondary">
+        Logout
+      </button>
     </div>
   );
 };
