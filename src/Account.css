@@ -1,0 +1,10 @@
+#userImage {
+  max-width: 300px;
+}
+
+#accountForm {
+  margin-top: 50px;
+  text-align: center;
+  flex: auto;
+  flex-wrap: nowrap;
+}

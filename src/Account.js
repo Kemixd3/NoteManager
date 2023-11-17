@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDoc, doc, setDoc } from "firebase/firestore";
-
+import "./Account.css";
 import { auth, firestore } from "./firebaseClient";
 
 const Account = ({ user, onLogout }) => {
@@ -69,11 +69,11 @@ const Account = ({ user, onLogout }) => {
   };
 
   return (
-    <div aria-live="polite">
+    <div aria-live="polite" id="accountForm">
       {loading ? (
         "Saving ..."
       ) : (
-        <form onSubmit={updateProfile} className="form-widget">
+        <form onSubmit={updateProfile} id="accountForm" className="form-widget">
           <div>Email: {user.email}</div>
           <div>
             <label htmlFor="username">Name</label>
