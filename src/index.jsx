@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 //import "./index.css";
 import Auth from "./pages/Auth";
@@ -8,6 +8,8 @@ import StockReceiving from "./scanning";
 import { auth } from "./firebaseClient";
 import NavbarDisplay from "./components/Nav";
 import "./frontcss.css";
+
+
 
 function App() {
   const [user, setUser] = useState(null);
