@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 //import "./index.css";
@@ -7,6 +7,7 @@ import Account from "./components/Account";
 import StockReceiving from "./scanning";
 import { auth } from "./firebaseClient";
 import NavbarDisplay from "./components/Nav";
+import "./frontcss.css";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -21,8 +22,10 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  //class="loader"
+
   if (isLoading) {
-    return <div class="loader"></div>;
+    return <div></div>;
   }
 
   return (

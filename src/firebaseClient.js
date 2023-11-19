@@ -2,24 +2,22 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import dotenv from "dotenv";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 // Your web app's Firebase configuration
 
-dotenv.config();
+console.log(import.meta.env.VITE_DB_APIKEY);
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_DB_APIKEY,
-  authDomain: process.env.REACT_APP_DB_AUTHDOMAIN,
-  projectId: process.env.REACT_APP_DB_PROJECTID,
-  storageBucket: process.env.REACT_APP_DB_STORAGEBUCKET,
-  messagingSenderId: process.env.REACT_APP_DB_MESSAGINGSENDERID,
-  appId: process.env.REACT_APP_DB_APPID,
-  measurementId: process.env.REACT_APP_DB_MEASUREMENTID,
+  apiKey: import.meta.env.VITE_DB_APIKEY,
+  authDomain: import.meta.env.VITE_DB_AUTHDOMAIN,
+  projectId: import.meta.env.VITE_DB_PROJECTID,
+  storageBucket: import.meta.env.VITE_DB_STORAGEBUCKET,
+  messagingSenderId: import.meta.env.VITE_DB_MESSAGINGSENDERID,
+  appId: import.meta.env.VITE_DB_APPID,
+  measurementId: import.meta.env.VITE_DB_MEASUREMENTID,
 };
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
