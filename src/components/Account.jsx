@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { collection, getDoc, doc, setDoc } from "firebase/firestore";
 import "./Account.css";
 import { auth, firestore } from "../firebaseClient";
@@ -62,6 +62,7 @@ const Account = ({ user, onLogout }) => {
   const handleLogout = async () => {
     try {
       await auth.signOut();
+      console.log(onLogout);
       //onLogout(); //TODO make callback function to handle logout in parent component
     } catch (error) {
       alert(error.message);
