@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDoc, doc, setDoc } from "firebase/firestore";
 import "./Account.css";
-import { auth, firestore } from "./firebaseClient";
+import { auth, firestore } from "../firebaseClient";
 
 const Account = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(true);

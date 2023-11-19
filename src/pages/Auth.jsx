@@ -5,7 +5,7 @@ import {
   signInWithEmailLink,
 } from "firebase/auth";
 
-import { auth } from "./firebaseClient";
+import { auth } from "../firebaseClient";
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);

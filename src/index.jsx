@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 //import "./index.css";
-import Auth from "./Auth";
-import Account from "./Account";
+import Auth from "./pages/Auth";
+import Account from "./components/Account";
 import StockReceiving from "./scanning";
 import { auth } from "./firebaseClient";
-import NavbarDisplay from "./Nav";
+import NavbarDisplay from "./components/Nav";
 
 function App() {
   const [user, setUser] = useState(null);
