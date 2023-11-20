@@ -1,32 +1,58 @@
 import { useState, useEffect } from "react";
-import { collection, getDoc, doc, setDoc } from "firebase/firestore";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../actions/userActions";
+
 import "./Account.css";
-import { auth, firestore } from "../firebaseClient";
+import { auth } from "../firebaseClient";
 
 const Account = ({ user, onLogout }) => {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
-  const [website, setWebsite] = useState(null);
+  const [email, setEmail] = useState(null);
   const [avatar_url, setAvatarUrl] = useState(null);
 
   useEffect(() => {
     const getProfile = async () => {
       try {
         setLoading(true);
-        const docRef = doc(collection(firestore, "profiles"), user.uid);
-        const docSnapshot = await getDoc(docRef);
+        const getUser = await fetch(
+          "http://localhost:3001/users/users/" + user.uid
+        );
+        const response = await getUser.json();
 
-        if (docSnapshot.exists()) {
-          const data = docSnapshot.data();
-          console.log("Profile Data:", data);
-
+        if (response != "User not found") {
           // Now you can access individual fields from the data object
-          setUsername(data.username);
-          setWebsite(data.website);
-          setAvatarUrl(data.avatar_url || "Picture");
+          setUsername(response.name || "No name uploaded");
+          setEmail(response.email || "No name uploaded");
+          setAvatarUrl(response.image || "No picture uploaded");
+          //console.log("DIS", response.user.image);
+          const UserData = {
+            userId: user.uid,
+            userName: response.user.name,
+            userEmail: response.user.email,
+            userImage: response.user.image,
+          };
+          dispatch(setUserData(UserData));
         } else {
           // Document does not exist
+          console.log("jup");
+
+          await fetch("http://localhost:3001/users/post", {
+            method: "POST",
+            body: JSON.stringify({
+              userid: user.uid,
+              name: "",
+              email: "",
+              image: "",
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          });
+
           setLoading(false);
+
           //console.log("Profile document does not exist");
         }
       } catch (error) {
@@ -37,23 +63,23 @@ const Account = ({ user, onLogout }) => {
     };
 
     getProfile();
-  }, [user]);
+  }, [user, dispatch]);
 
   const updateProfile = async (e) => {
     e.preventDefault();
 
     try {
       setLoading(true);
-      const updates = {
-        username,
-        website,
-        avatar_url,
-        updated_at: new Date(),
-      };
+      //const updates = {
+      //  username,
+      //
+      //  avatar_url,
+      //  updated_at: new Date(),
+      //};
 
-      await setDoc(doc(firestore, "profiles", user.uid), updates);
+      //await setDoc(doc(firestore, "profiles", user.uid), updates);
     } catch (error) {
-      alert(error.message);
+      alert("awdawdwadwad", error.message);
     } finally {
       setLoading(false);
     }
@@ -65,7 +91,7 @@ const Account = ({ user, onLogout }) => {
       console.log(onLogout);
       //onLogout(); //TODO make callback function to handle logout in parent component
     } catch (error) {
-      alert(error.message);
+      alert("awddawdawd", error.message);
     }
   };
 
@@ -75,7 +101,7 @@ const Account = ({ user, onLogout }) => {
         "Saving ..."
       ) : (
         <form onSubmit={updateProfile} id="accountForm" className="form-widget">
-          <div>Email: {user.email}</div>
+          <div>Email: {email}</div>
           <div>
             <label htmlFor="username">Name</label>
             <input

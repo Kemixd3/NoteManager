@@ -8,8 +8,8 @@ import StockReceiving from "./scanning";
 import { auth } from "./firebaseClient";
 import NavbarDisplay from "./components/Nav";
 import "./frontcss.css";
-
-
+import store from "./store";
+import { Provider } from "react-redux";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -36,14 +36,16 @@ function App() {
         <Auth />
       ) : (
         <div>
-          <NavbarDisplay user={user} />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Account user={user} />} />
-              <Route path="/scan" element={<StockReceiving />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </BrowserRouter>
+          <Provider store={store}>
+            <NavbarDisplay user={user} />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Account user={user} />} />
+                <Route path="/scan" element={<StockReceiving />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </BrowserRouter>
+          </Provider>
         </div>
       )}
     </div>
