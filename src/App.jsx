@@ -11,12 +11,19 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { DarkModeProvider } from "./Context/DarkmodeContext";
 import POOversigt from "./oversigt";
+import { themes, getTheme, setTheme } from "./ThemeColors";
 
 export const App = ({ darkModeDefault = false }) => {
   const [darkMode, setDarkMode] = useState(darkModeDefault);
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [currentTheme, nextTheme] = useState(getTheme());
+
+  useEffect(() => {
+    setTheme(currentTheme);
+    console.log(currentTheme);
+  }, [currentTheme]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -96,6 +103,17 @@ export const App = ({ darkModeDefault = false }) => {
                   setDarkMode={setDarkMode}
                   className={darkMode ? "darkmode" : undefined}
                 />
+                <select onChange={(event) => nextTheme(event.target.value)}>
+                  {themes.map((theme, i) => (
+                    <option
+                      selected={theme === currentTheme}
+                      key={i}
+                      value={theme}
+                    >
+                      {theme}
+                    </option>
+                  ))}
+                </select>
                 <BrowserRouter>
                   <Routes>
                     <Route

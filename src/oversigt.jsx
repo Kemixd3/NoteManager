@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./POOversigt.css";
 
 const POOversigt = () => {
@@ -9,13 +9,13 @@ const POOversigt = () => {
       try {
         //mangler at connect til API
 
-
-        const response = await get("/api/productOrders");
-        
-        
-        
-        
-        setProductOrders(response.data);
+        const getOrders = await fetch(
+          "http://localhost:3001/orders/product-orders"
+        );
+        const response = await getOrders.json();
+        setProductOrders(response);
+        console.log(productOrders);
+        console.log(response);
       } catch (error) {
         console.error("Error fetching product orders:", error);
       }
@@ -29,16 +29,12 @@ const POOversigt = () => {
   };
 
   return (
-    <div className="container"> 
+    <div className="container">
       <h1>PO oversigt</h1>
       <table>
         {productOrders.map((order) => (
-          <tr
-            key={order.id}
-            onClick={() => handleOrderClick(order.id)}
-          >
-            <td>{order.orderName}</td>
-            <td>{order.orderTime}</td>
+          <tr key={order.id} onClick={() => handleOrderClick(order.id)}>
+            <td>{order.notes}</td>
           </tr>
         ))}
       </table>

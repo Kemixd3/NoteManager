@@ -5,45 +5,29 @@ import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Image from "react-bootstrap/Image";
-import { useDarkMode } from "../Context/DarkmodeContext";
 
 function NavbarDisplay({ user, userData }) {
   //  const postMountStoreState = store.setUserData()
   //  if (postMountStoreState !== this.state.userData) {
   //    this.setState({ storeState: postMountStoreState })
   //}
-  const { darkMode, setDarkMode } = useDarkMode();
 
-  console.log(darkMode);
-  let navbarClasses = "nav"; // Default class
-
-  if (darkMode) {
-    navbarClasses += " dark-mode"; // Add dark mode class
-  } else {
-    navbarClasses += " light-mode"; // Add light mode class
-  }
   //const userData = useSelector((state) => state.userData);
 
   if (user) {
     return (
-      <Navbar expand="lg" className={navbarClasses} data-testid="nav">
+      <Navbar expand="lg" data-testid="nav">
         <Container>
-          <Navbar.Brand href="#home">Your Brand</Navbar.Brand>
+          <Navbar.Brand href="https://www.uxvtechnologies.com">
+            UXV Technologies
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/home">Home</Nav.Link>
               <Nav.Link href="/PO">PO oversigt</Nav.Link>
             </Nav>
-            <li className="settings__darkmode">
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                aria-label="Darkmode on/off"
-                type="button"
-              >
-                Toggle Dark Mode
-              </button>
-            </li>
+
             <Nav>
               {user && userData && userData.userImage ? (
                 <Nav.Link style={{ color: "black" }} disabled>
@@ -79,6 +63,3 @@ NavbarDisplay.propTypes = {
 };
 
 export default NavbarDisplay;
-
-
-

@@ -32,7 +32,7 @@ const Account = ({ user, userData, onLogout }) => {
         console.log(user, "her");
         if (userData != "User not found") {
           // Now you can access individual fields from the data object
-          setUsername(userData.name || "No name uploaded");
+          setUsername(userData.userName || "No name uploaded");
           setEmail(user.email || "No email uploaded");
           setAvatarUrl(userData.userImage || "No picture uploaded");
           //console.log("DIS", response.user.image);
@@ -56,12 +56,29 @@ const Account = ({ user, userData, onLogout }) => {
 
     try {
       setLoading(true);
-      //const updates = {
-      //  username,
-      //
-      //  avatar_url,
-      //  updated_at: new Date(),
-      //};
+      const response = await fetch(
+        `http://localhost:3001/users/users/${user.uid}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: username,
+            email: email,
+            image: avatar_url,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      // Update local state if the request was successful
+      setUsername(username);
+      setEmail(email);
+      setAvatarUrl(avatar_url);
 
       //await setDoc(doc(firestore, "profiles", user.uid), updates);
     } catch (error) {
