@@ -1,58 +1,44 @@
-import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { setUserData } from "../actions/userActions";
+import { createContext, useContext, useState, useEffect } from "react";
 
 import "./Account.css";
 import { auth } from "../firebaseClient";
+import { useSelector } from "react-redux";
+import { selectDarkMode } from "../store/darkModeSlice";
 
-const Account = ({ user, onLogout }) => {
-  const dispatch = useDispatch();
+const Account = ({ user, userData, onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
   const [avatar_url, setAvatarUrl] = useState(null);
+  const darkMode = useSelector(selectDarkMode);
+  console.log(darkMode);
+
+  console.log(userData, "account");
+  //const { userData, setUserData } = useUserData();
+  console.log(darkMode, "acc");
+  let bg = "nav"; // Default class
+
+  if (darkMode) {
+    bg += " dark-mode"; // Add dark mode class
+  } else {
+    bg += " light-mode"; // Add light mode class
+  }
 
   useEffect(() => {
     const getProfile = async () => {
       try {
         setLoading(true);
-        const getUser = await fetch(
-          "http://localhost:3001/users/users/" + user.uid
-        );
-        const response = await getUser.json();
 
-        if (response != "User not found") {
+        console.log(user, "her");
+        if (userData != "User not found") {
           // Now you can access individual fields from the data object
-          setUsername(response.name || "No name uploaded");
-          setEmail(response.email || "No name uploaded");
-          setAvatarUrl(response.image || "No picture uploaded");
+          setUsername(userData.name || "No name uploaded");
+          setEmail(user.email || "No email uploaded");
+          setAvatarUrl(userData.userImage || "No picture uploaded");
           //console.log("DIS", response.user.image);
-          const UserData = {
-            userId: user.uid,
-            userName: response.user.name,
-            userEmail: response.user.email,
-            userImage: response.user.image,
-          };
-          dispatch(setUserData(UserData));
         } else {
-          // Document does not exist
-          console.log("jup");
-
-          await fetch("http://localhost:3001/users/post", {
-            method: "POST",
-            body: JSON.stringify({
-              userid: user.uid,
-              name: "",
-              email: "",
-              image: "",
-            }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-          });
-
+          console.log("Error");
           setLoading(false);
-
           //console.log("Profile document does not exist");
         }
       } catch (error) {
@@ -63,7 +49,7 @@ const Account = ({ user, onLogout }) => {
     };
 
     getProfile();
-  }, [user, dispatch]);
+  }, [user]);
 
   const updateProfile = async (e) => {
     e.preventDefault();
@@ -96,7 +82,7 @@ const Account = ({ user, onLogout }) => {
   };
 
   return (
-    <div aria-live="polite" id="accountForm">
+    <div aria-live="polite" id="accountForm" className={bg}>
       {loading ? (
         "Saving ..."
       ) : (
@@ -129,11 +115,11 @@ const Account = ({ user, onLogout }) => {
               Update profile
             </button>
           </div>
+          <button onClick={handleLogout} className="button secondary">
+            Logout
+          </button>
         </form>
       )}
-      <button onClick={handleLogout} className="button secondary">
-        Logout
-      </button>
     </div>
   );
 };

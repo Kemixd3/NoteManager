@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useDarkMode } from "./Context/DarkmodeContext";
 
 const StockReceiving = () => {
   const [batch, setBatch] = useState([]);
   const [barcode, setBarcode] = useState("");
+  const { darkMode, setDarkMode } = useDarkMode();
+
+  console.log(darkMode, "Scan");
 
   //Add a new line to the batch
   const addLine = (barcodeValue) => {
