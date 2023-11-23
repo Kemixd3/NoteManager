@@ -10,6 +10,7 @@ import "./frontcss.css";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { DarkModeProvider } from "./Context/DarkmodeContext";
+import POOversigt from "./oversigt";
 
 export const App = ({ darkModeDefault = false }) => {
   const [darkMode, setDarkMode] = useState(darkModeDefault);
@@ -101,6 +102,7 @@ export const App = ({ darkModeDefault = false }) => {
                       path="/"
                       element={<Account user={user} userData={userData} />}
                     />
+                    <Route path="/PO" element={<POOversigt />} />
                     <Route path="/scan" element={<StockReceiving />} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>

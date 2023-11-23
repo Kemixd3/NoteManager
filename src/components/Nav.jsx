@@ -33,7 +33,7 @@ function NavbarDisplay({ user, userData }) {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/home">Home</Nav.Link>
-              <Nav.Link href="/scan">Scan page</Nav.Link>
+              <Nav.Link href="/PO">PO oversigt</Nav.Link>
             </Nav>
             <li className="settings__darkmode">
               <button
@@ -79,3 +79,6 @@ NavbarDisplay.propTypes = {
 };
 
 export default NavbarDisplay;
+
+
+

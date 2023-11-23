@@ -1,0 +1,30 @@
+
+/* Container styles */
+.container {
+    text-align: center;
+  }
+  
+  /* Heading styles */
+  h1 {
+    color: #333;
+  }
+  
+  /* List styles */
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  /* ListItem styles */
+  li {
+    border: 1px solid #ddd;
+    margin: 5px;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  /* ListItem hover effect */
+  li:hover {
+    background-color: #f0f0f0;
+  }
+  

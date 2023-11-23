@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useDarkMode } from "./Context/DarkmodeContext";
+import { useParams } from "react-router-dom";
 
 const StockReceiving = () => {
   const [batch, setBatch] = useState([]);
   const [barcode, setBarcode] = useState("");
   const { darkMode, setDarkMode } = useDarkMode();
+  const { id } = useParams(); // Retrieve the ID from the route parameters
 
   console.log(darkMode, "Scan");
+  console.log("Received ID:", id);
 
   //Add a new line to the batch
   const addLine = (barcodeValue) => {
