@@ -9,7 +9,7 @@ import NavbarDisplay from "./components/Nav";
 import "./frontcss.css";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
-import { DarkModeProvider } from "./Context/DarkmodeContext";
+//import { DarkModeProvider } from "./Context/DarkmodeContext";
 import POOversigt from "./oversigt";
 import { themes, getTheme, setTheme } from "./ThemeColors";
 
@@ -44,13 +44,14 @@ export const App = ({ darkModeDefault = false }) => {
           );
 
           const response = await getUser.json();
-
+          console.log(response, "her");
           if (response.message !== "User not found") {
             const UserData = {
               userId: user.uid,
               userName: response.user.name,
               userEmail: response.user.email,
               userImage: response.user.image,
+              userOrg: response.user.Organization,
             };
             setUserData(UserData);
             setIsLoadingUser(false);
@@ -91,47 +92,48 @@ export const App = ({ darkModeDefault = false }) => {
 
   return (
     <div>
-      <DarkModeProvider>
-        <Provider store={store}>
-          <div>
-            {userData && user && !isLoadingUser ? (
-              <div>
-                <NavbarDisplay
-                  user={user}
-                  userData={userData}
-                  darkMode={darkMode}
-                  setDarkMode={setDarkMode}
-                  className={darkMode ? "darkmode" : undefined}
-                />
-                <select onChange={(event) => nextTheme(event.target.value)}>
-                  {themes.map((theme, i) => (
-                    <option
-                      selected={theme === currentTheme}
-                      key={i}
-                      value={theme}
-                    >
-                      {theme}
-                    </option>
-                  ))}
-                </select>
-                <BrowserRouter>
-                  <Routes>
-                    <Route
-                      path="/"
-                      element={<Account user={user} userData={userData} />}
-                    />
-                    <Route path="/PO" element={<POOversigt />} />
-                    <Route path="/scan" element={<StockReceiving />} />
-                    <Route path="*" element={<Navigate to="/" />} />
-                  </Routes>
-                </BrowserRouter>
-              </div>
-            ) : (
-              <Auth />
-            )}
-          </div>
-        </Provider>
-      </DarkModeProvider>
+      <Provider store={store}>
+        <div>
+          {userData && user && !isLoadingUser ? (
+            <div>
+              <NavbarDisplay
+                user={user}
+                userData={userData}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                className={darkMode ? "darkmode" : undefined}
+              />
+              <select onChange={(event) => nextTheme(event.target.value)}>
+                {themes.map((theme, i) => (
+                  <option
+                    selected={theme === currentTheme}
+                    key={i}
+                    value={theme}
+                  >
+                    {theme}
+                  </option>
+                ))}
+              </select>
+              <BrowserRouter>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={<Account user={user} userData={userData} />}
+                  />
+                  <Route
+                    path="/PO"
+                    element={<POOversigt userData={userData.userOrg} />}
+                  />
+                  <Route path="/scan" element={<StockReceiving />} />
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+              </BrowserRouter>
+            </div>
+          ) : (
+            <Auth />
+          )}
+        </div>
+      </Provider>
     </div>
   );
 };

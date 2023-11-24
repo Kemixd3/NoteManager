@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./POOversigt.css";
 
-const POOversigt = () => {
+const POOversigt = (userData) => {
   const [productOrders, setProductOrders] = useState([]);
 
   useEffect(() => {
@@ -10,7 +10,7 @@ const POOversigt = () => {
         //mangler at connect til API
 
         const getOrders = await fetch(
-          "http://localhost:3001/orders/product-orders"
+          "http://localhost:3001/orders/product-orders?org=" + userData.userData
         );
         const response = await getOrders.json();
         setProductOrders(response);

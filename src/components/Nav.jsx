@@ -1,6 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import PropTypes from "prop-types";
-import { useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -11,7 +10,7 @@ function NavbarDisplay({ user, userData }) {
   //  if (postMountStoreState !== this.state.userData) {
   //    this.setState({ storeState: postMountStoreState })
   //}
-
+  console.log(userData);
   //const userData = useSelector((state) => state.userData);
 
   if (user) {
@@ -32,6 +31,7 @@ function NavbarDisplay({ user, userData }) {
               {user && userData && userData.userImage ? (
                 <Nav.Link style={{ color: "black" }} disabled>
                   <span className="me-2">Signed in as: {user.email}</span>
+                  <span className="me-2">In {userData.userOrg} </span>
                   <Image
                     src={userData.userImage}
                     alt="User Avatar"

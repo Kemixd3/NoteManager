@@ -2,27 +2,17 @@ import { createContext, useContext, useState, useEffect } from "react";
 
 import "./Account.css";
 import { auth } from "../firebaseClient";
-import { useSelector } from "react-redux";
-import { selectDarkMode } from "../store/darkModeSlice";
+//import { useSelector } from "react-redux";
+//import { selectDarkMode } from "../store/darkModeSlice";
 
 const Account = ({ user, userData, onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
   const [avatar_url, setAvatarUrl] = useState(null);
-  const darkMode = useSelector(selectDarkMode);
-  console.log(darkMode);
+  //const darkMode = useSelector(selectDarkMode);
 
   console.log(userData, "account");
-  //const { userData, setUserData } = useUserData();
-  console.log(darkMode, "acc");
-  let bg = "nav"; // Default class
-
-  if (darkMode) {
-    bg += " dark-mode"; // Add dark mode class
-  } else {
-    bg += " light-mode"; // Add light mode class
-  }
 
   useEffect(() => {
     const getProfile = async () => {
@@ -99,7 +89,7 @@ const Account = ({ user, userData, onLogout }) => {
   };
 
   return (
-    <div aria-live="polite" id="accountForm" className={bg}>
+    <div aria-live="polite" id="accountForm">
       {loading ? (
         "Saving ..."
       ) : (
