@@ -57,9 +57,9 @@ function NavbarDisplay({ user, userData }) {
   }
 }
 
-NavbarDisplay.propTypes = {
-  darkMode: PropTypes.bool.isRequired,
-  setDarkMode: PropTypes.func.isRequired,
-};
+//NavbarDisplay.propTypes = {
+//  darkMode: PropTypes.bool.isRequired,
+//  setDarkMode: PropTypes.func.isRequired,
+//};
 
 export default NavbarDisplay;

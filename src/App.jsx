@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
+//import PropTypes from "prop-types";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./pages/Auth";
 import HomePage from "./pages/home";
@@ -15,8 +15,8 @@ import { store } from "./store/store";
 import POOversigt from "./oversigt";
 import { themes, getTheme, setTheme } from "./ThemeColors";
 
-export const App = ({ darkModeDefault = false }) => {
-  const [darkMode, setDarkMode] = useState(darkModeDefault);
+export const App = () => {
+  //const [darkMode, setDarkMode] = useState(darkModeDefault);
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [userData, setUserData] = useState(null);
@@ -98,20 +98,13 @@ export const App = ({ darkModeDefault = false }) => {
         <div>
           {userData && user && !isLoadingUser ? (
             <div>
-              <NavbarDisplay
-                user={user}
-                userData={userData}
-                darkMode={darkMode}
-                setDarkMode={setDarkMode}
-                className={darkMode ? "darkmode" : undefined}
-              />
-              <select onChange={(event) => nextTheme(event.target.value)}>
+              <NavbarDisplay user={user} userData={userData} />
+              <select
+                onChange={(event) => nextTheme(event.target.value)}
+                value={currentTheme}
+              >
                 {themes.map((theme, i) => (
-                  <option
-                    selected={theme === currentTheme}
-                    key={i}
-                    value={theme}
-                  >
+                  <option key={i} value={theme}>
                     {theme}
                   </option>
                 ))}
@@ -145,6 +138,6 @@ export const App = ({ darkModeDefault = false }) => {
   );
 };
 
-App.propTypes = {
-  darkModeDefault: PropTypes.bool,
-};
+//App.propTypes = {
+//  darkModeDefault: PropTypes.bool,
+//};
