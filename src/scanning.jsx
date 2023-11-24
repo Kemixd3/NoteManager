@@ -1,17 +1,36 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDarkMode } from "./Context/DarkmodeContext";
 import { useParams } from "react-router-dom";
 
-const StockReceiving = () => {
+const StockReceiving = ({userData }) => {
   const [batch, setBatch] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [barcode, setBarcode] = useState("");
-  const { darkMode, setDarkMode } = useDarkMode();
   const { id } = useParams(); // Retrieve the ID from the route parameters
-
-  console.log(darkMode, "Scan");
   console.log("Received ID:", id);
 
-  //Add a new line to the batch
+  //const { darkMode, setDarkMode } = useDarkMode();
+  //console.log(darkMode, "Scan");
+
+
+  useEffect(() => {
+    async function getPosts() {
+      try {
+        const response = await fetch(`http://localhost:3001/orders/product-order-items/${id}`);
+        const data = await response.json();
+        console.log("a", data);
+        setPosts(data);  // Change this line to setBatch
+        
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    }
+  
+    getPosts();
+  }, [id]);  // Include id in the dependency array to re-run the effect when id changes
+  
+  console.log(posts);
+
   const addLine = (barcodeValue) => {
     setBatch([...batch, barcodeValue]);
   };

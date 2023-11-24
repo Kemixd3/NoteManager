@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./pages/Auth";
+import HomePage from "./pages/home";
+
 import Account from "./components/Account";
 import StockReceiving from "./scanning";
 import { auth } from "./firebaseClient";
@@ -118,13 +120,18 @@ export const App = ({ darkModeDefault = false }) => {
                 <Routes>
                   <Route
                     path="/"
+                    element={<HomePage user={user} userData={userData}/>}
+                  />
+                  <Route
+                    path="/account"
                     element={<Account user={user} userData={userData} />}
                   />
                   <Route
                     path="/PO"
                     element={<POOversigt userData={userData.userOrg} />}
                   />
-                  <Route path="/scan" element={<StockReceiving />} />
+                  <Route path="/scan/:id" element={<StockReceiving  user={user} userData={userData}/>} />
+
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </BrowserRouter>

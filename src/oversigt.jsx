@@ -35,9 +35,11 @@ const POOversigt = (userData) => {
         {productOrders.map((order) => (
           <tr key={order.id} onClick={() => handleOrderClick(order.id)}>
             <td>{order.notes}</td>
+            <td>{order.id}</td>
           </tr>
         ))}
       </table>
+
     </div>
   );
 };
