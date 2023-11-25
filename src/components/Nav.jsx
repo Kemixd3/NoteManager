@@ -29,7 +29,7 @@ function NavbarDisplay({ user, userData }) {
 
             <Nav>
               {user && userData && userData.userImage ? (
-                <Nav.Link style={{ color: "black" }} disabled>
+                <Nav.Link style={{ color: "black" }} href="/account">
                   <span className="me-2">Signed in as: {user.email}</span>
                   <span className="me-2">In {userData.userOrg} </span>
                   <Image
@@ -41,6 +41,7 @@ function NavbarDisplay({ user, userData }) {
                     style={{ cursor: "pointer" }}
                   />
                 </Nav.Link>
+
               ) : (
                 // Your fallback UI when user data is not available
                 <Nav.Link style={{ color: "black" }} href="#login">
