@@ -43,15 +43,7 @@ const StockReceiving = ({ userData }) => {
     fetchData();
   }, [id]);
   
-  
-
-
-  
-  // get all batches where PO id, after that only show if item id er samme som selected
-  
-
-
-
+      // batch details: 
 
   const addLine = (barcodeValue) => {
     setBatch([...batch, barcodeValue]);
@@ -93,27 +85,46 @@ const StockReceiving = ({ userData }) => {
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
-    <div style={{ flex: 1, padding: "46px" }}>
+      <div style={sectionStyle}>
         <h2>Stock Receiving</h2>
+          <div style={buttonContainerStyle}>
         <div>
           <input
             type="text"
-            placeholder="Enter barcode manually"
+            placeholder="Enter barcode"
             value={barcode}
             onChange={handleManualEntry}
+            style={{ width: "24%", padding: "8px" }} // Adjust width and padding
           />
-          <button onClick={() => addLine(barcode)}>Add Manually</button>
-          <button onClick={handleScan}>Scan Barcode</button>
-          <button onClick={handleSubmit}>Submit Batch</button>
+            <button style={buttonStyle} onClick={() => addLine(barcode)}>
+              Add Manually
+            </button>
+            <button style={buttonStyle} onClick={handleScan}>
+              Scan Barcode
+            </button>
+            <button style={buttonStyle} onClick={handleSubmit}>
+              Submit Batch
+            </button>
+          </div>
         </div>
         <div>
-          <ul>
-            {batch.map((barcodeValue, index) => (
-              <li key={index}>{barcodeValue}</li>
-            ))}
-          </ul>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+
+
+            <tbody>
+              {batch.map((item, index) => (
+                <tr key={index}>
+                  <td style={tableCellStyle}>{index+1}</td>
+                  <td style={tableCellStyle}>{item}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+      
         </div>
       </div>
+
+
 
       <div style={{ flex: 1, padding: "46px" }}>
         <h2>Batch Details</h2>
@@ -143,20 +154,25 @@ const StockReceiving = ({ userData }) => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
+              <th style={tableHeaderStyle}></th>
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Quantity</th>
               <th style={tableHeaderStyle}>SI Number</th>
+              <th style={tableHeaderStyle}>Type</th>
               <th style={tableHeaderStyle}>Vælg</th>
             </tr>
           </thead>
           <tbody>
             {posts.map((item, index) => (
               <tr key={index}>
+                <td style={tableCellStyle}>{index+1}</td>
                 <td style={tableCellStyle}>{item.Name}</td>
                 <td style={tableCellStyle}>{item.Quantity}</td>
                 <td style={tableCellStyle}>{item.item_id}</td>
+                <td style={tableCellStyle}>{item.type_id}</td>
+
                 <td style={tableCellStyle}>
-                  <button onClick={() => handleItemButtonClick(item.item_id)}>
+                  <button style={cellButton} onClick={() => handleItemButtonClick(item.item_id)}>
                     Scan
                   </button>
                 </td>
@@ -178,6 +194,28 @@ const tableHeaderStyle = {
 const tableCellStyle = {
   border: "1px solid #ddd",
   padding: "8px",
+};
+const sectionStyle = {
+  flex: 1,
+  padding: "46px",
+};
+
+const cellButton = {
+  padding: 0, // Remove padding
+  width: "100%",
+  height: "100%",
+};
+
+const buttonContainerStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0px", 
+};
+
+const buttonStyle = {
+  padding: "8px",
+  
+  width: "25%", 
 };
 
 export default StockReceiving;

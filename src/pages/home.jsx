@@ -13,7 +13,7 @@ export default function HomePage({ user, userData }) {
     async function getPosts() {
       try {
         const response = await fetch(
-          "http://localhost:3001/orders/product-orders?org=" + userData.userData
+          "http://localhost:3001/orders/product-orders?org=" + userData.userOrg
         );
         const data = await response.json();
         console.log("a", data);
