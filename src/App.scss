@@ -152,6 +152,15 @@ $generic-bg: #db4c3f;
   width: 100%;
 }
 
+.darkmode .collapse {
+  background-color: #18191a;
+  color: #0099e0;
+}
+
+.darkmode .collapse div a:hover {
+  color: #ffffff;
+}
+
 .darkmode a {
   color: #b0b3b8;
 }
@@ -170,6 +179,10 @@ $generic-bg: #db4c3f;
   height: 44px;
 
   width: 100%;
+}
+
+.collapse {
+  background-color: #ffffff;
 }
 
 nav {

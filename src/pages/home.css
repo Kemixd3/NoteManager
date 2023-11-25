@@ -1,0 +1,52 @@
+.darkmode .gantt_grid_head_cell {
+  background-color: #18191a;
+}
+
+.darkmode .gantt_scale_cell {
+  background-color: #18191a;
+}
+
+.darkmode .gantt_data_area {
+  background-color: #18191a;
+}
+
+.darkmode .gantt_grid_data {
+  background-color: #18191a;
+}
+
+.darkmode .gantt_task_cell {
+  background-color: #18191a;
+}
+
+.darkmode .gantt_row {
+  background-color: #18191a;
+}
+
+.darkmode .gantt_row_task {
+  background-color: #18191a;
+}
+
+.darkmode .gantt_row.odd,
+.gantt_task_row.odd {
+  background-color: #18191a;
+}
+
+.darkmode .gantt_task_cell {
+  background-color: #18191a;
+}
+
+.gantt_task_cell {
+  background-color: #b0b3b8;
+}
+
+.darkmode .gantt_tree_content {
+  color: #b0b3b8;
+}
+
+.darkmode .gantt_task .gantt_task_scale .gantt_scale_cell {
+  color: #b0b3b8;
+}
+
+.darkmode .gantt_grid_scale .gantt_grid_head_cell {
+  color: #b0b3b8;
+}

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import "dhtmlx-gantt";
 
 import "dhtmlx-gantt/codebase/skins/dhtmlxgantt_contrast_white.css";
-import "dhtmlx-gantt/codebase/skins/dhtmlxgantt_contrast_black.css";
+
 import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
+import { style } from "@mui/system";
+import "./home.css";
 
 export default function HomePage({ user, userData }) {
   const [posts, setPosts] = useState([]);

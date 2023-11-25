@@ -21,7 +21,7 @@ function NavbarDisplay({ user, userData }) {
             UXV Technologies
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
+          <Navbar.Collapse className="collapse">
             <Nav className="me-auto">
               <Nav.Link href="/home">Home</Nav.Link>
               <Nav.Link href="/PO">PO oversigt</Nav.Link>
@@ -31,7 +31,7 @@ function NavbarDisplay({ user, userData }) {
               {user && userData && userData.userImage ? (
                 <Nav.Link style={{ color: "black" }} href="/account">
                   <span className="me-2">Signed in as: {user.email}</span>
-                  <span className="me-2">In {userData.userOrg} </span>
+                  <span className="me-5">In {userData.userOrg} </span>
                   <Image
                     src={userData.userImage}
                     alt="User Avatar"
@@ -41,7 +41,6 @@ function NavbarDisplay({ user, userData }) {
                     style={{ cursor: "pointer" }}
                   />
                 </Nav.Link>
-
               ) : (
                 // Your fallback UI when user data is not available
                 <Nav.Link style={{ color: "black" }} href="#login">
