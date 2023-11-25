@@ -5,7 +5,7 @@ import Auth from "./pages/Auth";
 import HomePage from "./pages/home";
 
 import Account from "./components/Account";
-import StockReceiving from "./scanning";
+import StockReceiving from "./pages/scanning";
 import { auth } from "./firebaseClient";
 import NavbarDisplay from "./components/Nav";
 import "./frontcss.css";
@@ -113,7 +113,7 @@ export const App = () => {
                 <Routes>
                   <Route
                     path="/"
-                    element={<HomePage user={user} userData={userData}/>}
+                    element={<HomePage user={user} userData={userData} />}
                   />
                   <Route
                     path="/account"
@@ -123,7 +123,10 @@ export const App = () => {
                     path="/PO"
                     element={<POOversigt userData={userData.userOrg} />}
                   />
-                  <Route path="/scan/:id" element={<StockReceiving  user={user} userData={userData}/>} />
+                  <Route
+                    path="/scan/:id"
+                    element={<StockReceiving user={user} userData={userData} />}
+                  />
 
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>

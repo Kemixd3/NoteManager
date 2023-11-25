@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDarkMode } from "./Context/DarkmodeContext";
+import { useDarkMode } from "../Context/DarkmodeContext";
 import { useParams } from "react-router-dom";
 
 const StockReceiving = ({ userData }) => {
@@ -7,29 +7,57 @@ const StockReceiving = ({ userData }) => {
   const [batches, setAllBatches] = useState([]);
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
-
+  const [receivedOrder, setReceivedOrder] = useState([]);
   const [selected, setSelected] = useState([]);
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [postsResponse, batchesResponse] = await Promise.all([
-          fetch(`http://localhost:3001/orders/product-order-items/${id}`),
-          fetch(`http://localhost:3001/batches`)
-        ]);
-  
+        const [postsResponse, batchesResponse, receivedOrders] =
+          await Promise.all([
+            fetch(`http://localhost:3001/orders/product-order-items/${id}`),
+            fetch(`http://localhost:3001/batches`),
+            fetch(`http://localhost:3001/receiving/received-orders/${id}`),
+          ]);
+
         const postsData = await postsResponse.json();
         const batchesData = await batchesResponse.json();
-        console.log("postsData",postsData);
-        console.log("batchesData",batchesData);
+        const receivedData = await receivedOrders.json();
 
-        let tempBatches = []
-        batchesData.batches.forEach(element => {
-          if (element.product_order_id == id){
-            tempBatches.push(element)
+        if (!receivedData.error) {
+          console.log(receivedData, "HER");
+          console.log(receivedData.error, "HER2!!!");
+          setReceivedOrder(receivedData);
+        } else {
+          console.log("2");
+
+          const currentDate = new Date()
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+          fetch("http://localhost:3001/receiving/received-orders", {
+            method: "POST",
+            body: JSON.stringify({
+              received_date: currentDate,
+              product_order_id: id,
+              Organization: userData.userOrg,
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          });
+        }
+
+        console.log("postsData", postsData);
+        console.log("batchesData", batchesData);
+
+        let tempBatches = [];
+
+        batchesData.batches.forEach((element) => {
+          if (element.product_order_id == id) {
+            tempBatches.push(element);
           }
         });
         console.log(tempBatches);
@@ -39,11 +67,11 @@ const StockReceiving = ({ userData }) => {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
   }, [id]);
-  
-      // batch details: 
+
+  // get all batches where PO id, after that only show if item id er samme som selected
 
   const addLine = (barcodeValue) => {
     setBatch([...batch, barcodeValue]);
@@ -73,7 +101,9 @@ const StockReceiving = ({ userData }) => {
 
   // Function to handle the button click for each item
   const handleItemButtonClick = (itemId) => {
-    setFilteredBatches(batches.filter((element) => element.si_number === itemId))
+    setFilteredBatches(
+      batches.filter((element) => element.si_number === itemId)
+    );
     console.log(filteredBatches);
     setSelected(itemId);
   };
@@ -85,46 +115,27 @@ const StockReceiving = ({ userData }) => {
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <div style={sectionStyle}>
+      <div style={{ flex: 1, padding: "46px" }}>
         <h2>Stock Receiving</h2>
-          <div style={buttonContainerStyle}>
         <div>
           <input
             type="text"
-            placeholder="Enter barcode"
+            placeholder="Enter barcode manually"
             value={barcode}
             onChange={handleManualEntry}
-            style={{ width: "24%", padding: "8px" }} // Adjust width and padding
           />
-            <button style={buttonStyle} onClick={() => addLine(barcode)}>
-              Add Manually
-            </button>
-            <button style={buttonStyle} onClick={handleScan}>
-              Scan Barcode
-            </button>
-            <button style={buttonStyle} onClick={handleSubmit}>
-              Submit Batch
-            </button>
-          </div>
+          <button onClick={() => addLine(barcode)}>Add Manually</button>
+          <button onClick={handleScan}>Scan Barcode</button>
+          <button onClick={handleSubmit}>Submit Batch</button>
         </div>
         <div>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-
-
-            <tbody>
-              {batch.map((item, index) => (
-                <tr key={index}>
-                  <td style={tableCellStyle}>{index+1}</td>
-                  <td style={tableCellStyle}>{item}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-      
+          <ul>
+            {batch.map((barcodeValue, index) => (
+              <li key={index}>{barcodeValue}</li>
+            ))}
+          </ul>
         </div>
       </div>
-
-
 
       <div style={{ flex: 1, padding: "46px" }}>
         <h2>Batch Details</h2>
@@ -142,7 +153,6 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.batch_name}</td>
                 <td style={tableCellStyle}>{item.createdBy}</td>
                 <td style={tableCellStyle}>{item.received_date}</td>
-
               </tr>
             ))}
           </tbody>
@@ -154,25 +164,20 @@ const StockReceiving = ({ userData }) => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              <th style={tableHeaderStyle}></th>
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Quantity</th>
               <th style={tableHeaderStyle}>SI Number</th>
-              <th style={tableHeaderStyle}>Type</th>
               <th style={tableHeaderStyle}>Vælg</th>
             </tr>
           </thead>
           <tbody>
             {posts.map((item, index) => (
               <tr key={index}>
-                <td style={tableCellStyle}>{index+1}</td>
                 <td style={tableCellStyle}>{item.Name}</td>
                 <td style={tableCellStyle}>{item.Quantity}</td>
                 <td style={tableCellStyle}>{item.item_id}</td>
-                <td style={tableCellStyle}>{item.type_id}</td>
-
                 <td style={tableCellStyle}>
-                  <button style={cellButton} onClick={() => handleItemButtonClick(item.item_id)}>
+                  <button onClick={() => handleItemButtonClick(item.item_id)}>
                     Scan
                   </button>
                 </td>
@@ -194,28 +199,6 @@ const tableHeaderStyle = {
 const tableCellStyle = {
   border: "1px solid #ddd",
   padding: "8px",
-};
-const sectionStyle = {
-  flex: 1,
-  padding: "46px",
-};
-
-const cellButton = {
-  padding: 0, // Remove padding
-  width: "100%",
-  height: "100%",
-};
-
-const buttonContainerStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "0px", 
-};
-
-const buttonStyle = {
-  padding: "8px",
-  
-  width: "25%", 
 };
 
 export default StockReceiving;
