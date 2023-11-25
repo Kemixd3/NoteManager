@@ -19,7 +19,9 @@ const StockReceiving = ({ userData }) => {
         await Promise.all([
           fetch(`http://localhost:3001/orders/product-order-items/${id}`),
           fetch(`http://localhost:3001/batches`),
-          fetch(`http://localhost:3001/receiving/received-orders/${id}`),
+          fetch(
+            `http://localhost:3001/receiving/received-orders/${id}/${userData.userOrg}`
+          ),
         ]);
 
       const postsData = await postsResponse.json();
