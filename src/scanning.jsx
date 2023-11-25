@@ -5,11 +5,13 @@ import { useParams } from "react-router-dom";
 const StockReceiving = ({ userData }) => {
   const [batch, setBatch] = useState([]);
   const [batches, setAllBatches] = useState([]);
+  const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
+
   const [selected, setSelected] = useState([]);
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
-  console.log("Received ID:", id);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,7 +81,8 @@ const StockReceiving = ({ userData }) => {
 
   // Function to handle the button click for each item
   const handleItemButtonClick = (itemId) => {
-    // TODO: Add your logic for handling the button click for the specific item
+    setFilteredBatches(batches.filter((element) => element.si_number === itemId))
+    console.log(filteredBatches);
     setSelected(itemId);
   };
 
@@ -89,9 +92,9 @@ const StockReceiving = ({ userData }) => {
   };
 
   return (
-    <div style={{ display: "flex" }}>
-      <div>
-        <h1>Stock Receiving</h1>
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+    <div style={{ flex: 1, padding: "46px" }}>
+        <h2>Stock Receiving</h2>
         <div>
           <input
             type="text"
@@ -101,20 +104,42 @@ const StockReceiving = ({ userData }) => {
           />
           <button onClick={() => addLine(barcode)}>Add Manually</button>
           <button onClick={handleScan}>Scan Barcode</button>
+          <button onClick={handleSubmit}>Submit Batch</button>
         </div>
         <div>
-          <h2>Batch Details</h2>
           <ul>
             {batch.map((barcodeValue, index) => (
               <li key={index}>{barcodeValue}</li>
             ))}
           </ul>
-          <button onClick={handleSubmit}>Submit Batch</button>
         </div>
       </div>
-      <div style={{ marginLeft: "auto", padding: "46px" }}>
+
+      <div style={{ flex: 1, padding: "46px" }}>
+        <h2>Batch Details</h2>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={tableHeaderStyle}>Name</th>
+              <th style={tableHeaderStyle}>Made by</th>
+              <th style={tableHeaderStyle}>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredBatches.map((item, index) => (
+              <tr key={index}>
+                <td style={tableCellStyle}>{item.batch_name}</td>
+                <td style={tableCellStyle}>{item.createdBy}</td>
+                <td style={tableCellStyle}>{item.received_date}</td>
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ flex: 1, padding: "46px" }}>
         <h2>Product Order Details</h2>
-        {/* Display items in a table with lines between cells */}
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
@@ -122,7 +147,6 @@ const StockReceiving = ({ userData }) => {
               <th style={tableHeaderStyle}>Quantity</th>
               <th style={tableHeaderStyle}>SI Number</th>
               <th style={tableHeaderStyle}>Vælg</th>
-              {/* Add other table headers as needed */}
             </tr>
           </thead>
           <tbody>
@@ -136,7 +160,6 @@ const StockReceiving = ({ userData }) => {
                     Scan
                   </button>
                 </td>
-                {/* Add other table cells as needed */}
               </tr>
             ))}
           </tbody>
