@@ -129,11 +129,16 @@ const StockReceiving = ({ userData }) => {
           <button onClick={handleSubmit}>Submit Batch</button>
         </div>
         <div>
-          <ul>
-            {batch.map((barcodeValue, index) => (
-              <li key={index}>{barcodeValue}</li>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <tbody>
+            {batch.map((item, index) => (
+              <tr key={index}>
+                <td style={tableCellStyle}>{index+1}</td>
+                <td style={tableCellStyle}>{item}</td>
+              </tr>
             ))}
-          </ul>
+          </tbody>
+          </table>
         </div>
       </div>
 
@@ -167,6 +172,7 @@ const StockReceiving = ({ userData }) => {
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Quantity</th>
               <th style={tableHeaderStyle}>SI Number</th>
+              <th style={tableHeaderStyle}>Type</th>
               <th style={tableHeaderStyle}>Vælg</th>
             </tr>
           </thead>
@@ -176,6 +182,7 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.Name}</td>
                 <td style={tableCellStyle}>{item.Quantity}</td>
                 <td style={tableCellStyle}>{item.item_id}</td>
+                <td style={tableCellStyle}>{item.type_id}</td>
                 <td style={tableCellStyle}>
                   <button onClick={() => handleItemButtonClick(item.item_id)}>
                     Scan
