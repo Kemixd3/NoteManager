@@ -8,50 +8,29 @@ const StockReceiving = ({ userData }) => {
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
   const [receivedOrder, setReceivedOrder] = useState([]);
+  const [reload, ReloadOrders] = useState([]);
   const [selected, setSelected] = useState([]);
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [postsResponse, batchesResponse, receivedOrders] =
-          await Promise.all([
-            fetch(`http://localhost:3001/orders/product-order-items/${id}`),
-            fetch(`http://localhost:3001/batches`),
-            fetch(`http://localhost:3001/receiving/received-orders/${id}`),
-          ]);
+      const [postsResponse, batchesResponse, receivedOrders] =
+        await Promise.all([
+          fetch(`http://localhost:3001/orders/product-order-items/${id}`),
+          fetch(`http://localhost:3001/batches`),
+          fetch(`http://localhost:3001/receiving/received-orders/${id}`),
+        ]);
 
-        const postsData = await postsResponse.json();
-        const batchesData = await batchesResponse.json();
-        const receivedData = await receivedOrders.json();
+      const postsData = await postsResponse.json();
+      const batchesData = await batchesResponse.json();
 
-        if (!receivedData.error) {
-          console.log(receivedData, "HER");
-          console.log(receivedData.error, "HER2!!!");
-          setReceivedOrder(receivedData);
-        } else {
-          console.log("2");
+      const receivedData = await receivedOrders.json();
 
-          const currentDate = new Date()
-            .toISOString()
-            .slice(0, 19)
-            .replace("T", " ");
-          fetch("http://localhost:3001/receiving/received-orders", {
-            method: "POST",
-            body: JSON.stringify({
-              received_date: currentDate,
-              product_order_id: id,
-              Organization: userData.userOrg,
-            }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-          });
-        }
+      if (!receivedData.message) {
+        console.log(receivedData, "receivedData");
 
-        console.log("postsData", postsData);
-        console.log("batchesData", batchesData);
+        setReceivedOrder(receivedData);
 
         let tempBatches = [];
 
@@ -63,13 +42,32 @@ const StockReceiving = ({ userData }) => {
         console.log(tempBatches);
         setPosts(postsData.productOrderItems);
         setAllBatches(tempBatches);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } else {
+        const currentDate = new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " ");
+
+        fetch("http://localhost:3001/receiving/received-orders", {
+          method: "POST",
+          body: JSON.stringify({
+            received_date: currentDate,
+            product_order_id: id,
+            Organization: userData.userOrg,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }).then((response) => {
+          if (response.status === 201) {
+            ReloadOrders([]);
+          }
+        });
       }
     };
 
     fetchData();
-  }, [id]);
+  }, [id, reload]);
 
   // get all batches where PO id, after that only show if item id er samme som selected
 
