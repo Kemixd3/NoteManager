@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "dhtmlx-gantt";
 
 import "dhtmlx-gantt/codebase/skins/dhtmlxgantt_contrast_white.css";
@@ -15,7 +15,7 @@ export default function HomePage({ user, userData }) {
     async function getPosts() {
       try {
         const response = await fetch(
-          "http://localhost:3001/orders/product-orders?org=" + userData.userOrg
+          "http://localhost:3001/orders/purchase-orders?org=" + userData.userOrg
         );
         const data = await response.json();
         console.log("a", data);

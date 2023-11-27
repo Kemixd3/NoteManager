@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useDarkMode } from "../Context/DarkmodeContext";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const StockReceiving = ({ userData }) => {
@@ -17,7 +16,7 @@ const StockReceiving = ({ userData }) => {
     const fetchData = async () => {
       const [postsResponse, batchesResponse, receivedOrders] =
         await Promise.all([
-          fetch(`http://localhost:3001/orders/product-order-items/${id}`),
+          fetch(`http://localhost:3001/orders/purchase-order-items/${id}`),
           fetch(`http://localhost:3001/batches`),
           fetch(
             `http://localhost:3001/receiving/received-orders/${id}/${userData.userOrg}`
@@ -37,12 +36,12 @@ const StockReceiving = ({ userData }) => {
         let tempBatches = [];
 
         batchesData.batches.forEach((element) => {
-          if (element.product_order_id == id) {
+          if (element.purchase_order_id == id) {
             tempBatches.push(element);
           }
         });
         console.log(tempBatches);
-        setPosts(postsData.productOrderItems);
+        setPosts(postsData.purchaseOrderItems);
         setAllBatches(tempBatches);
       } else {
         const currentDate = new Date()
@@ -54,7 +53,7 @@ const StockReceiving = ({ userData }) => {
           method: "POST",
           body: JSON.stringify({
             received_date: currentDate,
-            product_order_id: id,
+            purchase_order_id: id,
             Organization: userData.userOrg,
           }),
           headers: {
@@ -129,15 +128,15 @@ const StockReceiving = ({ userData }) => {
           <button onClick={handleSubmit}>Submit Batch</button>
         </div>
         <div>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <tbody>
-            {batch.map((item, index) => (
-              <tr key={index}>
-                <td style={tableCellStyle}>{index+1}</td>
-                <td style={tableCellStyle}>{item}</td>
-              </tr>
-            ))}
-          </tbody>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {batch.map((item, index) => (
+                <tr key={index}>
+                  <td style={tableCellStyle}>{index + 1}</td>
+                  <td style={tableCellStyle}>{item}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       </div>
@@ -165,7 +164,7 @@ const StockReceiving = ({ userData }) => {
       </div>
 
       <div style={{ flex: 1, padding: "46px" }}>
-        <h2>Product Order Details</h2>
+        <h2>purchase Order Details</h2>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
@@ -182,7 +181,7 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.Name}</td>
                 <td style={tableCellStyle}>{item.Quantity}</td>
                 <td style={tableCellStyle}>{item.item_id}</td>
-                <td style={tableCellStyle}>{item.type_id}</td>
+                <td style={tableCellStyle}>{item.item_type}</td>
                 <td style={tableCellStyle}>
                   <button onClick={() => handleItemButtonClick(item.item_id)}>
                     Scan
