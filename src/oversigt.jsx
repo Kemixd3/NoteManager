@@ -11,7 +11,7 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 
 const POOversigt = (userData) => {
-  const [productOrders, setProductOrders] = useState([]);
+  const [purchaseOrders, setpurchaseOrders] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,14 +19,15 @@ const POOversigt = (userData) => {
         //mangler at connect til API
 
         const getOrders = await fetch(
-          "http://localhost:3001/orders/product-orders?org=" + userData.userData
+          "http://localhost:3001/orders/purchase-orders?org=" +
+            userData.userData
         );
         const response = await getOrders.json();
-        setProductOrders(response);
-        console.log(productOrders);
+        setpurchaseOrders(response);
+        console.log(purchaseOrders);
         console.log(response);
       } catch (error) {
-        console.error("Error fetching product orders:", error);
+        console.error("Error fetching purchase orders:", error);
       }
     };
 
@@ -46,7 +47,7 @@ const POOversigt = (userData) => {
     };
   }
 
-  const rows = productOrders.map((order) => createRow(order));
+  const rows = purchaseOrders.map((order) => createRow(order));
 
   return (
     <TableContainer component={Paper}>
