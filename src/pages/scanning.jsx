@@ -98,6 +98,11 @@ const StockReceiving = ({ userData }) => {
     // clear batch
   };
 
+  const handleEditButtonClick = (item) => {
+    // Call edit batch
+    console.log(item);
+  };
+
   // Function to handle the button click for each item
   const handleItemButtonClick = (itemId) => {
     setFilteredBatches(
@@ -149,6 +154,7 @@ const StockReceiving = ({ userData }) => {
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Made by</th>
               <th style={tableHeaderStyle}>Date</th>
+              <th style={tableHeaderStyle}>Edit</th>
             </tr>
           </thead>
           <tbody>
@@ -157,6 +163,11 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.batch_name}</td>
                 <td style={tableCellStyle}>{item.createdBy}</td>
                 <td style={tableCellStyle}>{item.received_date}</td>
+                <td style={tableCellStyle}>
+                  <button onClick={() => handleEditButtonClick(item)}>
+                    Edit
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -164,7 +175,7 @@ const StockReceiving = ({ userData }) => {
       </div>
 
       <div style={{ flex: 1, padding: "46px" }}>
-        <h2>purchase Order Details</h2>
+        <h2>Purchase Order Details</h2>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>

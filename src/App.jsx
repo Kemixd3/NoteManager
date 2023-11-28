@@ -14,6 +14,7 @@ import { store } from "./store/store";
 //import { DarkModeProvider } from "./Context/DarkmodeContext";
 import POOversigt from "./oversigt";
 import { themes, getTheme, setTheme } from "./ThemeColors";
+console.log("a");
 
 export const App = () => {
   //const [darkMode, setDarkMode] = useState(darkModeDefault);
