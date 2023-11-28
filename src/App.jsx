@@ -16,26 +16,35 @@ import POOversigt from "./oversigt";
 import { themes, getTheme, setTheme } from "./ThemeColors";
 console.log("a");
 
+import { useUser } from "./Context/UserContext";
+
 export const App = () => {
+  const {
+    user,
+    setUser,
+    userData,
+    setUserData,
+    isLoadingUser,
+    setIsLoadingUser,
+  } = useUser();
+
   //const [darkMode, setDarkMode] = useState(darkModeDefault);
-  const [user, setUser] = useState(null);
-  const [isLoadingUser, setIsLoadingUser] = useState(true);
-  const [userData, setUserData] = useState(null);
-  const [currentTheme, nextTheme] = useState(getTheme());
-
   useEffect(() => {
-    setTheme(currentTheme);
-    console.log(currentTheme);
-  }, [currentTheme]);
-
-  useEffect(() => {
+    console.log("Works?");
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
       setIsLoadingUser(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [setUser, setIsLoadingUser]);
+
+  const [currentTheme, nextTheme] = useState(getTheme());
+
+  useEffect(() => {
+    setTheme(currentTheme);
+    console.log(currentTheme);
+  }, [currentTheme]);
 
   useEffect(() => {
     const getProfile = async () => {
@@ -47,7 +56,8 @@ export const App = () => {
           );
 
           const response = await getUser.json();
-          console.log(response, "her");
+          console.log(response, "her!!!");
+
           if (response.message !== "User not found") {
             const UserData = {
               userId: user.uid,

@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dialog } from "react";
 import { useParams } from "react-router-dom";
+import BatchDialog from "../components/NewBatch";
 
 const StockReceiving = ({ userData }) => {
   const [batch, setBatch] = useState([]);
@@ -11,6 +12,12 @@ const StockReceiving = ({ userData }) => {
   const [selected, setSelected] = useState([]);
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
+
+  const [userId, setUserId] = useState(userData.userId);
+  console.log(userId, "USER");
+
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,6 +68,7 @@ const StockReceiving = ({ userData }) => {
           },
         }).then((response) => {
           if (response.status === 201) {
+            console.log("RELOAD");
             ReloadOrders([]);
           }
         });
@@ -98,18 +106,14 @@ const StockReceiving = ({ userData }) => {
     // clear batch
   };
 
-  const handleEditButtonClick = (item) => {
-    // Call edit batch
-    console.log(item);
+  const handleRowClick = (data) => {
+    setSelectedItem(data);
+    setIsDialogOpen(true);
   };
 
-  // Function to handle the button click for each item
-  const handleItemButtonClick = (itemId) => {
-    setFilteredBatches(
-      batches.filter((element) => element.si_number === itemId)
-    );
-    console.log(filteredBatches);
-    setSelected(itemId);
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedItem(null); // Reset selected item
   };
 
   // TEST function to generate a random barcode
@@ -164,9 +168,7 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.createdBy}</td>
                 <td style={tableCellStyle}>{item.received_date}</td>
                 <td style={tableCellStyle}>
-                  <button onClick={() => handleEditButtonClick(item)}>
-                    Edit
-                  </button>
+                  <button onClick={() => handleRowClick(item)}>Edit</button>
                 </td>
               </tr>
             ))}
@@ -194,14 +196,18 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.item_id}</td>
                 <td style={tableCellStyle}>{item.item_type}</td>
                 <td style={tableCellStyle}>
-                  <button onClick={() => handleItemButtonClick(item.item_id)}>
-                    Scan
-                  </button>
+                  <button onClick={() => handleRowClick(item)}>Scan</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {isDialogOpen && (
+          <BatchDialog
+            selectedItem={selectedItem}
+            handleCloseDialog={handleCloseDialog}
+          />
+        )}
       </div>
     </div>
   );
