@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./NewBatch.css";
 
 export default function BatchDialog({ selectedItem, handleCloseDialog }) {
   const [formData, setFormData] = useState({});
@@ -23,19 +24,21 @@ export default function BatchDialog({ selectedItem, handleCloseDialog }) {
   };
 
   return (
-    <dialog open>
-      <form onSubmit={handleSubmit}>
-        {/* here render form fields to edit data */}
-        <input
-          type="text"
-          value={formData.Name || ""}
-          onChange={(e) => setFormData({ ...formData, Name: e.target.value })}
-        />
+    <div className="backdrop">
+      <dialog open>
+        <form onSubmit={handleSubmit}>
+          {/* here render form fields to edit data */}
+          <input
+            type="text"
+            value={formData.Name || ""}
+            onChange={(e) => setFormData({ ...formData, Name: e.target.value })}
+          />
 
-        {/* Submit here */}
-        <button type="submit">Save</button>
-      </form>
-      <button onClick={handleCloseDialog}>Close</button>
-    </dialog>
+          {/* Submit here */}
+          <button type="submit">Save</button>
+        </form>
+        <button onClick={handleCloseDialog}>Close</button>
+      </dialog>
+    </div>
   );
 }
