@@ -51,12 +51,23 @@ const POOversigt = (userData) => {
 
   return (
     <TableContainer component={Paper}>
+      <h2>Order Details</h2>
       <Table sx={{ minWidth: 700 }} aria-label="spanning table">
-        <TableHead></TableHead>
+        <TableHead>
+          <TableCell align="right">
+            <strong>Order ID</strong>
+          </TableCell>
+          <TableCell align="right">
+            <strong>Ordered By</strong>
+          </TableCell>
+          <TableCell align="right">
+            <strong>Notes</strong>
+          </TableCell>
+          <TableCell align="right"></TableCell>
+        </TableHead>
         <TableBody>
           {rows.map((row, index) => (
             <TableRow key={index}>
-              <TableCell>{row.desc}</TableCell>
               <TableCell align="right">{row.order_id}</TableCell>
               <TableCell align="right">{row.Buyer}</TableCell>
               <TableCell align="right">{row.notes}</TableCell>

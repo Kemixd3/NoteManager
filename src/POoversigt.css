@@ -1,30 +1,62 @@
-
 /* Container styles */
 .container {
-    text-align: center;
-  }
-  
-  /* Heading styles */
-  h1 {
-    color: #333;
-  }
-  
-  /* List styles */
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  /* ListItem styles */
-  li {
-    border: 1px solid #ddd;
-    margin: 5px;
-    padding: 10px;
-    cursor: pointer;
-  }
-  
-  /* ListItem hover effect */
-  li:hover {
-    background-color: #f0f0f0;
-  }
-  
+  text-align: center;
+}
+
+/* Heading styles */
+h1 {
+  color: #333;
+}
+
+/* List styles */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* ListItem styles */
+li {
+  border: 1px solid #ddd;
+  margin: 5px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+/* ListItem hover effect */
+li:hover {
+  background-color: #f0f0f0;
+}
+
+.darkmode .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
+  background-color: #18191a !important;
+}
+
+.darkmode th strong {
+  color: #f0f0f0;
+}
+
+.darkmode .css-177gid-MuiTableCell-root {
+  color: #f0f0f0 !important;
+}
+
+.darkmode h2 {
+  color: #b0b3b8;
+}
+
+.darkmode .css-177gid-MuiTableCell-root {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #b0b3b8 !important;
+}
+
+.darkmode .css-1ex1afd-MuiTableCell-root {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #b0b3b8 !important;
+}
+
+.darkmode .css-1azl6jz-MuiTableCell-root {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #b0b3b8 !important;
+}

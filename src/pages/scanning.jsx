@@ -9,7 +9,7 @@ const StockReceiving = ({ userData }) => {
   const [posts, setPosts] = useState([]);
   const [receivedOrder, setReceivedOrder] = useState([]);
   const [reload, ReloadOrders] = useState([]);
-  const [selected, setSelected] = useState([]);
+
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
 
@@ -101,14 +101,20 @@ const StockReceiving = ({ userData }) => {
   // Function to submit the batch
   const handleSubmit = () => {
     console.log("Batch submitted:", batch);
-    console.log("item selected:", selected);
+
     // TODO send the batch data to the backend WITH quantity
     // clear batch
   };
 
   const handleRowClick = (data) => {
-    setSelectedItem(data);
-    setIsDialogOpen(true);
+    console.log(data, "THIS");
+
+    if (data.item_type == "Tablet") {
+      setSelectedItem(data);
+      setIsDialogOpen(true);
+    } else {
+      console.log("component or tablet");
+    }
   };
 
   const handleCloseDialog = () => {
@@ -155,6 +161,7 @@ const StockReceiving = ({ userData }) => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
+              <th style={tableHeaderStyle}>Line</th>
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Made by</th>
               <th style={tableHeaderStyle}>Date</th>
@@ -164,6 +171,7 @@ const StockReceiving = ({ userData }) => {
           <tbody>
             {filteredBatches.map((item, index) => (
               <tr key={index}>
+                <td style={tableCellStyle}>{index + 1}</td>
                 <td style={tableCellStyle}>{item.batch_name}</td>
                 <td style={tableCellStyle}>{item.createdBy}</td>
                 <td style={tableCellStyle}>{item.received_date}</td>
@@ -181,6 +189,7 @@ const StockReceiving = ({ userData }) => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
+              <th style={tableHeaderStyle}>Line</th>
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Quantity</th>
               <th style={tableHeaderStyle}>SI Number</th>
@@ -191,6 +200,7 @@ const StockReceiving = ({ userData }) => {
           <tbody>
             {posts.map((item, index) => (
               <tr key={index}>
+                <td style={tableCellStyle}>{index + 1}</td>
                 <td style={tableCellStyle}>{item.Name}</td>
                 <td style={tableCellStyle}>{item.Quantity}</td>
                 <td style={tableCellStyle}>{item.item_id}</td>
