@@ -94,7 +94,11 @@ const Account = ({ user, userData, onLogout }) => {
         "Saving ..."
       ) : (
         <form onSubmit={updateProfile} id="accountForm" className="form-widget">
-          <div>Email: {email}</div>
+          <div>
+            <h4>{email}</h4>
+          </div>
+
+          <img id="userImage" src={avatar_url} alt="User Avatar" />
           <div>
             <label htmlFor="username">Name</label>
             <input
@@ -115,14 +119,20 @@ const Account = ({ user, userData, onLogout }) => {
               onChange={(e) => setAvatarUrl(e.target.value)}
             />
           </div>
-          <img id="userImage" src={avatar_url} alt="User Avatar" />
-
           <div>
-            <button className="button primary block" disabled={loading}>
+            <button
+              className="button primary block"
+              type="submit"
+              disabled={loading}
+            >
               Update profile
             </button>
           </div>
-          <button onClick={handleLogout} className="button secondary">
+          <button
+            onClick={handleLogout}
+            type="submit"
+            className="button secondary"
+          >
             Logout
           </button>
         </form>
