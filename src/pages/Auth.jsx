@@ -10,7 +10,7 @@ import { auth } from "../firebaseClient";
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
-  console.log(auth);
+
   const handleLogin = async (e) => {
     e.preventDefault();
 

@@ -1,0 +1,209 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,700,900");
+
+// General Settings
+html {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+@mixin mq($from) {
+  @media (max-width: $from) {
+    @content;
+  }
+}
+
+/* Header
+  ============================================ */
+:root {
+  --lightest: #e4e6eb;
+  --medium: #3a3b3c;
+  --darker: #18191a;
+}
+
+.darkmode nav {
+  background-color: #18191a;
+
+  -webkit-transition: height 200ms ease-in;
+  transition: height 200ms ease-in;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  height: 44px;
+
+  width: 100%;
+}
+
+.darkmode .collapse {
+  background-color: #18191a;
+  color: #0099e0;
+}
+
+.darkmode .collapse div a:hover {
+  color: #ffffff;
+}
+
+.darkmode a {
+  color: #b0b3b8;
+}
+
+.darkmode span {
+  color: #b0b3b8;
+}
+
+.lightmode nav {
+  background-color: var(--lightest);
+  margin-top: 200px;
+  -webkit-transition: height 200ms ease-in;
+  transition: height 200ms ease-in;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  height: 44px;
+
+  width: 100%;
+}
+
+.collapse {
+  background-color: #ffffff;
+}
+
+nav {
+  background-color: var(--lightest);
+  -webkit-transition: height 200ms ease-in;
+  transition: height 200ms ease-in;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  height: 44px;
+  z-index: 400;
+  position: fixed;
+  top: 0;
+  width: 100%;
+
+  @include mq("900px") {
+    padding: 0 10px;
+  }
+
+  nav {
+    display: grid;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    max-width: 922px;
+    margin: auto;
+    height: 44px;
+
+    p,
+    li {
+      color: white;
+    }
+
+    div {
+      &.logo {
+        padding-left: 8px;
+        grid-area: 1 / 1;
+
+        img {
+          width: 24px;
+        }
+      }
+
+      &.settings {
+        grid-area: 1 / 2;
+        text-align: right;
+
+        ul {
+          float: right;
+        }
+
+        ul li {
+          list-style-type: none;
+          cursor: pointer;
+          width: 30px;
+          height: 30px;
+          text-align: center;
+          vertical-align: middle;
+          float: left;
+
+          &:hover {
+            border-radius: 3px;
+            background-color: rgba(255, 255, 255, 0.2);
+          }
+        }
+      }
+    }
+  }
+}
+
+.darkmode {
+  color-scheme: dark;
+  --color-text-muted: #818d98;
+  --color-text: var(--color-light);
+  --color-text-intense: var(--color-light-intentse);
+
+  --color-ui-intense: #67717e;
+  --color-ui: #454b54;
+  --color-ui-muted: #383d47;
+
+  --color-background-muted: var(--color-dark-muted);
+  --color-background: var(--color-dark);
+  --color-background-intense: var(--color-dark-intense);
+  --color-background-card: var(--color-dark-muted);
+  background-color: var(--color-dark);
+  --color-link-default: #64b5f6;
+  --color-link-hover: #bbdefb;
+  --color-link-visited: #ce93d8;
+
+  --color-shadow-intense: rgba(0, 0, 0, 0.3);
+  --color-shadow: rgba(0, 0, 0, 0.2);
+  --color-shadow-muted: rgba(0, 0, 0, 0.1);
+}
+
+.lightmode {
+  color-scheme: light;
+  --color-text-muted: #5c6770;
+  --color-text: var(--color-dark);
+  --color-text-intense: var(--color-dark-intentse);
+
+  --color-ui-intense: #9da7af;
+  --color-ui: #b9c0c6;
+  --color-ui-muted: #d6dade;
+
+  --color-background-muted: var(--color-light-muted);
+  --color-background: var(--color-light);
+  --color-background-intense: var(--color-light-intense);
+  --color-background-card: var(--color-light-intense);
+
+  --color-link-default: #1565c0;
+  --color-link-hover: #0d47a1;
+  --color-link-visited: #7b1fa2;
+
+  --color-shadow-intense: rgba(0, 0, 0, 0.2);
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-muted: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme {
+  --brand: var(--brand-light);
+  --text: var(--text-black);
+  --black: var(--black);
+  --white: var(--white);
+  --body: var(--body-light);
+  --menu: var(--menu-light);
+}
+
+.dark-theme {
+  --brand: var(--brand-dark);
+  --text: var(--text-white);
+  --black: var(--black);
+  --white: var(--white);
+  --body: var(--body-dark);
+  --menu: var(--menu-dark);
+}
