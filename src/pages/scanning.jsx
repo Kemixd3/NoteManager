@@ -11,7 +11,8 @@ const StockReceiving = ({ userData }) => {
   const [selected, setSelected] = useState([]);
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
-
+  const [editableItems, setEditableItems] = useState([]);
+  const [editedValues, setEditedValues] = useState({});
   useEffect(() => {
     const fetchData = async () => {
       const [postsResponse, batchesResponse, receivedOrders] =
@@ -91,25 +92,104 @@ const StockReceiving = ({ userData }) => {
   };
 
   // Function to submit the batch
-  const handleSubmit = () => {
-    console.log("Batch submitted:", batch);
-    console.log("item selected:", selected);
-    // TODO send the batch data to the backend WITH quantity
-    // clear batch
+  const handleSubmit = async () => {
+    try {
+      console.log("Batch submitted:", batch);
+      console.log("item selected:", selected);
+      const currentDate = new Date();
+
+      // Prepare data to send to the backend
+      const data = {
+        batch_name: batch[0],
+        received_date: currentDate.toISOString(), 
+        si_id: selected.SI_number, 
+        item_type: selected.item_type, 
+        items: [
+          {          
+          item_name: selected.Name, 
+          quantity: selected.quantity, 
+          order_id: selected.order_id
+          },
+        ],
+      };
+  
+      // Send the data to the backend
+      const response = await fetch("http://localhost:3001/batches", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Add any other headers if needed
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (response.ok) {
+        console.log("Batch created successfully");
+        // Clear batch or perform any other necessary actions
+      } else {
+        console.error("Error creating batch:", response.statusText);
+        // Handle the error as needed
+      }
+    } catch (error) {
+      console.error("Error creating batch:", error);
+      // Handle the error as needed
+    }
   };
+  
 
   const handleEditButtonClick = (item) => {
-    // Call edit batch
-    console.log(item);
+    // Toggle the editing state for the clicked item
+    setEditableItems((prevEditableItems) => {
+      if (prevEditableItems.includes(item)) {
+        return prevEditableItems.filter((editableItem) => editableItem !== item);
+      } else {
+        return [...prevEditableItems, item];
+      }
+    });
+
+    // Store the current values of the item for editing
+    setEditedValues((prevEditedValues) => ({
+      ...prevEditedValues,
+      [item.id]: { ...item },
+    }));
   };
 
-  // Function to handle the button click for each item
-  const handleItemButtonClick = (itemId) => {
-    setFilteredBatches(
-      batches.filter((element) => element.si_number === itemId)
+  const handleInputChange = (event, item) => {
+    // Update the edited values when input changes
+    const { name, value } = event.target;
+    setEditedValues((prevEditedValues) => ({
+      ...prevEditedValues,
+      [item.id]: {
+        ...prevEditedValues[item.id],
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleSaveButtonClick = (item) => {
+    // Handle saving the edited values
+    // Implement the logic to save the edited values, e.g., API call or state update
+    console.log("Saving edited values:", editedValues[item.id]);
+
+    // Remove the item from the editableItems array
+    setEditableItems((prevEditableItems) =>
+      prevEditableItems.filter((editableItem) => editableItem !== item)
     );
-    console.log(filteredBatches);
-    setSelected(itemId);
+  };
+
+  const tableCellStyle = { border: "1px solid black", padding: "8px" };
+  const tableHeaderStyle = { border: "1px solid black", padding: "8px", fontWeight: "bold" };
+
+
+  // Function to handle the button click for each item
+  const handleItemButtonClick = (item) => {
+    setFilteredBatches(
+      batches.filter((element) => element.si_number === item.item_id)
+    );
+    console.log("filteredBatches",filteredBatches);
+    console.log("item",item);
+
+    setSelected(item);
   };
 
   // TEST function to generate a random barcode
@@ -147,32 +227,69 @@ const StockReceiving = ({ userData }) => {
       </div>
 
       <div style={{ flex: 1, padding: "46px" }}>
-        <h2>Batch Details</h2>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={tableHeaderStyle}>Name</th>
-              <th style={tableHeaderStyle}>Made by</th>
-              <th style={tableHeaderStyle}>Date</th>
-              <th style={tableHeaderStyle}>Edit</th>
+      <h2>Batch Details</h2>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={tableHeaderStyle}>Name</th>
+            <th style={tableHeaderStyle}>Made by</th>
+            <th style={tableHeaderStyle}>Date</th>
+            <th style={tableHeaderStyle}>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredBatches.map((item, index) => (
+            <tr key={index}>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <input
+                    type="text"
+                    name="batch_name"
+                    value={editedValues[item.id]?.batch_name || item.batch_name}
+                    onChange={(event) => handleInputChange(event, item)}
+                  />
+                ) : (
+                  item.batch_name
+                )}
+              </td>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <input
+                    type="text"
+                    name="createdBy"
+                    value={editedValues[item.id]?.createdBy || item.createdBy}
+                    onChange={(event) => handleInputChange(event, item)}
+                  />
+                ) : (
+                  item.createdBy
+                )}
+              </td>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <input
+                    type="text"
+                    name="received_date"
+                    value={editedValues[item.id]?.received_date || item.received_date}
+                    onChange={(event) => handleInputChange(event, item)}
+                  />
+                ) : (
+                  item.received_date
+                )}
+              </td>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <button onClick={() => handleSaveButtonClick(item)}>Save</button>
+                ) : (
+                  <button onClick={() => handleEditButtonClick(item)}>Edit</button>
+                )}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredBatches.map((item, index) => (
-              <tr key={index}>
-                <td style={tableCellStyle}>{item.batch_name}</td>
-                <td style={tableCellStyle}>{item.createdBy}</td>
-                <td style={tableCellStyle}>{item.received_date}</td>
-                <td style={tableCellStyle}>
-                  <button onClick={() => handleEditButtonClick(item)}>
-                    Edit
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+
 
       <div style={{ flex: 1, padding: "46px" }}>
         <h2>Purchase Order Details</h2>
@@ -194,7 +311,7 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.item_id}</td>
                 <td style={tableCellStyle}>{item.item_type}</td>
                 <td style={tableCellStyle}>
-                  <button onClick={() => handleItemButtonClick(item.item_id)}>
+                  <button onClick={() => handleItemButtonClick(item)}>
                     Scan
                   </button>
                 </td>
