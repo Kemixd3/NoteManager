@@ -7,7 +7,7 @@ const StockReceiving = ({ userData }) => {
   const [batches, setAllBatches] = useState([]);
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [receivedOrder, setReceivedOrder] = useState([]);
+  const [receivedGoods, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
 
   const [barcode, setBarcode] = useState("");
@@ -21,24 +21,25 @@ const StockReceiving = ({ userData }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [postsResponse, batchesResponse, receivedOrders] =
-        await Promise.all([
+      const [postsResponse, batchesResponse, receivedGoods] = await Promise.all(
+        [
           fetch(`http://localhost:3001/orders/purchase-order-items/${id}`),
           fetch(`http://localhost:3001/batches`),
           fetch(
-            `http://localhost:3001/receiving/received-orders/${id}/${userData.userOrg}`
+            `http://localhost:3001/receiving/received-goods/${id}/${userData.userOrg}`
           ),
-        ]);
+        ]
+      );
 
       const postsData = await postsResponse.json();
       const batchesData = await batchesResponse.json();
 
-      const receivedData = await receivedOrders.json();
+      const receivedData = await receivedGoods.json();
 
       if (!receivedData.message) {
         console.log(receivedData, "receivedData");
 
-        setReceivedOrder(receivedData);
+        setReceivedGoods(receivedData);
 
         let tempBatches = [];
 
@@ -56,7 +57,7 @@ const StockReceiving = ({ userData }) => {
           .slice(0, 19)
           .replace("T", " ");
 
-        fetch("http://localhost:3001/receiving/received-orders", {
+        fetch("http://localhost:3001/receiving/received-goods", {
           method: "POST",
           body: JSON.stringify({
             received_date: currentDate,
