@@ -5,6 +5,7 @@ import axios from "axios";
 
 const StockReceiving = ({ userData }) => {
   const [post, setPost] = React.useState(null);
+  const [selected, setSelected] = useState([]);
 
   const [batch, setBatch] = useState([]);
   const [batches, setAllBatches] = useState([]);
@@ -88,7 +89,13 @@ const StockReceiving = ({ userData }) => {
     fetchData();
   }, [id, reload]);
 
-  // get all batches where PO id, after that only show if item id er samme som selected
+  const handleSaveButtonClick = (item) => {
+    console.log("Saving edited values:", editedValues[item.id]);
+
+    setEditableItems((prevEditableItems) =>
+      prevEditableItems.filter((editableItem) => editableItem !== item)
+    );
+  };
 
   const addLine = (barcodeValue) => {
     setBatch([...batch, barcodeValue]);
@@ -110,21 +117,51 @@ const StockReceiving = ({ userData }) => {
 
   // Function to submit the batch
   const handleSubmit = () => {
-    console.log("Batch submitted:", batch);
+    const currentDate = new Date();
+
+    const data = {
+      batch_name: batch[0],
+      received_date: currentDate.toISOString(), 
+      si_id: selected.SI_number, 
+      item_type: selected.item_type, 
+      items: [
+        {          
+        item_name: selected.Name, 
+        quantity: selected.quantity, 
+        order_id: selected.order_id
+        },
+      ],
+    };
+    
+    if (response.ok) {
+      console.log("Batch created successfully");
+      // Clear batch or perform any other necessary actions
+    } else {
+      console.error("Error creating batch:", response.statusText);
+      // Handle the error as needed
+    }
+
+    if (selected.item_type == "Tablet") {
+      setSelectedItem(selected);
+      setIsDialogOpen(true);
+    } else {
+      console.log("component or tablet");
+    }
+
 
     // TODO send the batch data to the backend WITH quantity
     // clear batch
   };
 
   const handleRowClick = (data) => {
-    console.log(data, "THIS");
+    console.log("a",data);
+    console.log("bbbbbb",receivedGoodsData);
 
-    if (data.item_type == "Tablet") {
-      setSelectedItem(data);
-      setIsDialogOpen(true);
-    } else {
-      console.log("component or tablet");
-    }
+    setFilteredBatches(
+      receivedGoodsData.filter((element) => element.received_goods_id === data.SI_number)
+    );
+    console.log("ffff",filteredBatches);
+    setSelected(data);
   };
 
   const handleCloseDialog = () => {
@@ -167,35 +204,68 @@ const StockReceiving = ({ userData }) => {
       </div>
 
       <div style={{ flex: 1, padding: "46px" }}>
-        <h2>Batch Details</h2>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={tableHeaderStyle}>Line</th>
-              <th style={tableHeaderStyle}>Name</th>
-              <th style={tableHeaderStyle}>Made by</th>
-              <th style={tableHeaderStyle}>Date</th>
-              <th style={tableHeaderStyle}>SI number</th>
-              <th style={tableHeaderStyle}>Edit</th>
+      <h2>Batch Details</h2>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={tableHeaderStyle}>Name</th>
+            <th style={tableHeaderStyle}>Made by</th>
+            <th style={tableHeaderStyle}>Date</th>
+            <th style={tableHeaderStyle}>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredBatches.map((item, index) => (
+            <tr key={index}>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <input
+                    type="text"
+                    name="batch_name"
+                    value={editedValues[item.id]?.batch_name || item.batch_name}
+                    onChange={(event) => handleInputChange(event, item)}
+                  />
+                ) : (
+                  item.batch_name
+                )}
+              </td>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <input
+                    type="text"
+                    name="createdBy"
+                    value={editedValues[item.id]?.createdBy || item.createdBy}
+                    onChange={(event) => handleInputChange(event, item)}
+                  />
+                ) : (
+                  item.createdBy
+                )}
+              </td>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <input
+                    type="text"
+                    name="received_date"
+                    value={editedValues[item.id]?.received_date || item.received_date}
+                    onChange={(event) => handleInputChange(event, item)}
+                  />
+                ) : (
+                  item.received_date
+                )}
+              </td>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <button onClick={() => handleSaveButtonClick(item)}>Save</button>
+                ) : (
+                  <button onClick={() => handleEditButtonClick(item)}>Edit</button>
+                )}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {batches.map((item, index) => (
-              <tr key={index}>
-                <td style={tableCellStyle}>{index + 1}</td>
-                <td style={tableCellStyle}>{item.batch_name}</td>
-                <td style={tableCellStyle}>{item.createdBy}</td>
-                <td style={tableCellStyle}>{item.received_date}</td>
-                <td style={tableCellStyle}>{item.si_number}</td>
+          ))}
+        </tbody>
+      </table>
+    </div>
 
-                <td style={tableCellStyle}>
-                  <button onClick={() => handleRowClick(item)}>Edit</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
 
       <div style={{ flex: 1, padding: "46px" }}>
         <h2>Purchase Order Details</h2>
