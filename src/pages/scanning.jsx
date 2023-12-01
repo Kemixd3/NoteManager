@@ -1,13 +1,16 @@
-import { useState, useEffect, Dialog } from "react";
+import React, { useState, useEffect, Dialog } from "react";
 import { useParams } from "react-router-dom";
 import BatchDialog from "../components/NewBatch";
+import axios from "axios";
 
 const StockReceiving = ({ userData }) => {
+  const [post, setPost] = React.useState(null);
+
   const [batch, setBatch] = useState([]);
   const [batches, setAllBatches] = useState([]);
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [receivedGoods, setReceivedGoods] = useState([]);
+  const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
 
   const [barcode, setBarcode] = useState("");
@@ -21,36 +24,42 @@ const StockReceiving = ({ userData }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [postsResponse, batchesResponse, receivedGoods] = await Promise.all(
-        [
-          fetch(`http://localhost:3001/orders/purchase-order-items/${id}`),
-          fetch(`http://localhost:3001/batches`),
-          fetch(
-            `http://localhost:3001/receiving/received-goods/${id}/${userData.userOrg}`
-          ),
-        ]
-      );
+      const [postsResponse, receivedGoods] = await Promise.all([
+        fetch(`http://localhost:3001/orders/purchase-order-items/${id}`),
+
+        fetch(
+          `http://localhost:3001/receiving/received-goods/${id}/${userData.userOrg}`
+        ),
+      ]);
 
       const postsData = await postsResponse.json();
-      const batchesData = await batchesResponse.json();
 
       const receivedData = await receivedGoods.json();
 
       if (!receivedData.message) {
-        console.log(receivedData, "receivedData");
-
-        setReceivedGoods(receivedData);
+        setReceivedGoods(receivedData.receivedGoods);
 
         let tempBatches = [];
 
-        batchesData.batches.forEach((element) => {
-          if (element.purchase_order_id == id) {
-            tempBatches.push(element);
-          }
-        });
+        //batchesData.batches.forEach((element) => {
+        //  if (element.purchase_order_id == id) {
+        //    tempBatches.push(element);
+        //  }
+        //});
+
+        axios
+          .get(
+            "http://localhost:3001/batches/" +
+              receivedData.receivedGoods[0].received_goods_id
+          )
+          .then((response) => {
+            setAllBatches(response.data);
+            console.log(batches, "THEBATCH");
+          });
+
+        console.log(batches, "THEBATCH");
         console.log(tempBatches);
         setPosts(postsData.purchaseOrderItems);
-        setAllBatches(tempBatches);
       } else {
         const currentDate = new Date()
           .toISOString()
@@ -166,16 +175,19 @@ const StockReceiving = ({ userData }) => {
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Made by</th>
               <th style={tableHeaderStyle}>Date</th>
+              <th style={tableHeaderStyle}>SI number</th>
               <th style={tableHeaderStyle}>Edit</th>
             </tr>
           </thead>
           <tbody>
-            {filteredBatches.map((item, index) => (
+            {batches.map((item, index) => (
               <tr key={index}>
                 <td style={tableCellStyle}>{index + 1}</td>
                 <td style={tableCellStyle}>{item.batch_name}</td>
                 <td style={tableCellStyle}>{item.createdBy}</td>
                 <td style={tableCellStyle}>{item.received_date}</td>
+                <td style={tableCellStyle}>{item.si_number}</td>
+
                 <td style={tableCellStyle}>
                   <button onClick={() => handleRowClick(item)}>Edit</button>
                 </td>
@@ -217,6 +229,7 @@ const StockReceiving = ({ userData }) => {
           <BatchDialog
             selectedItem={selectedItem}
             handleCloseDialog={handleCloseDialog}
+            recieved_goods={receivedGoodsData}
           />
         )}
       </div>
