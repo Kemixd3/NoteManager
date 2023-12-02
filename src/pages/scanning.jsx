@@ -52,10 +52,9 @@ const StockReceiving = ({ userData }) => {
         //  }
         //});
 
-
         axios
           .get(
-            "http://localhost:3001/batchAll"
+            `http://localhost:3001/batches/${receivedData.receivedGoods[0].received_goods_id}`
           )
           .then((response) => {
             console.log(response.data);
