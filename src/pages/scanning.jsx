@@ -16,6 +16,12 @@ const StockReceiving = ({ userData }) => {
   const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
 
+
+  const [SelectedBatchItems, setSelectedBatchItems] = useState([]);
+  const [EditableItemsInBatch, setEditableItemsInBatch] = useState([]);  // State to track editable items
+
+  
+
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
 
@@ -102,6 +108,41 @@ const StockReceiving = ({ userData }) => {
     setEditableItems([item]);
   };
 
+
+
+
+
+
+  
+  const handleItemSaveButtonClick = (item) => {
+    setEditableItemsInBatch((SelectedBatchItems) =>
+      SelectedBatchItems.filter((EditableItemsInBatch) => EditableItemsInBatch !== item)
+    );
+  };
+
+const handleItemSelectButtonClick = async (item) => {
+  console.log("item", item);
+
+  try {
+    const response = await fetch(`/received_goods_items?received_goods_id=${item.received_goods_received_goods_id}&si_number=${item.si_number}`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      setSelectedBatchItems([item]);
+    } else {
+      console.error('Failed to fetch data:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+};
+
+
+
+
+
+
   const handleInputChange = (event, item) => {
     const { name, value } = event.target;
     setEditedValues((prevValues) => ({
@@ -146,9 +187,7 @@ const StockReceiving = ({ userData }) => {
 
   const handleRowClick = (data) => {
     setFilteredBatches(newbatches.filter((element) => element.si_number == data.SI_number));
-    console.log("s",newbatches);
-    console.log("ss",filteredBatches);
-    console.log("sss",data);
+
 
     setSelected(data);
   };
@@ -192,21 +231,40 @@ const StockReceiving = ({ userData }) => {
         </div>
       </div>
 
+
+      <div style={{ flex: 1, padding: "46px", position: "absolute", bottom: 0 }}>
+        <div>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              {SelectedBatchItems.map((item, index) => (
+                <tr key={index}>
+                  <td style={tableCellStyle}>{index + 1}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div style={{ flex: 1, padding: "46px" }}>
       <h2>Batch Details</h2>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
+            <th style={tableHeaderStyle}>Line</th>
             <th style={tableHeaderStyle}>Name</th>
             <th style={tableHeaderStyle}>Made by</th>
             <th style={tableHeaderStyle}>Date</th>
-            
+            <td style={tableCellStyle}>Select</td>
+
             <th style={tableHeaderStyle}>Edit</th>
           </tr>
         </thead>
         <tbody>
           {filteredBatches.map((item, index) => (
             <tr key={index}>
+              <td style={tableCellStyle}>{index + 1}</td>
+
               <td style={tableCellStyle}>
                 {editableItems.includes(item) ? (
                   <input
@@ -241,6 +299,13 @@ const StockReceiving = ({ userData }) => {
                   />
                 ) : (
                   item.received_date
+                )}
+              </td>
+              <td style={tableCellStyle}>
+                {editableItems.includes(item) ? (
+                  <button onClick={() => handleItemSaveButtonClick(item)}>Save</button>
+                ) : (
+                  <button onClick={() => handleItemSelectButtonClick(item)}>Select</button>
                 )}
               </td>
               <td style={tableCellStyle}>
