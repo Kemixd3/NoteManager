@@ -6,7 +6,9 @@ import axios from "axios";
 const StockReceiving = ({ userData }) => {
   const [post, setPost] = React.useState(null);
   const [selected, setSelected] = useState([]);
-
+  const [newbatches, newsetAllBatches] = useState([]);
+  const [editableItems, setEditableItems] = useState([]);  // State to track editable items
+  const [editedValues, setEditedValues] = useState({}); 
   const [batch, setBatch] = useState([]);
   const [batches, setAllBatches] = useState([]);
   const [filteredBatches, setFilteredBatches] = useState([]);
@@ -37,7 +39,9 @@ const StockReceiving = ({ userData }) => {
 
       const receivedData = await receivedGoods.json();
 
+
       if (!receivedData.message) {
+        console.log("receivedData",receivedData);
         setReceivedGoods(receivedData.receivedGoods);
 
         let tempBatches = [];
@@ -48,18 +52,16 @@ const StockReceiving = ({ userData }) => {
         //  }
         //});
 
+
         axios
           .get(
-            "http://localhost:3001/batches/" +
-              receivedData.receivedGoods[0].received_goods_id
+            "http://localhost:3001/batchAll"
           )
           .then((response) => {
-            setAllBatches(response.data);
-            console.log(batches, "THEBATCH");
+            console.log(response.data);
+            newsetAllBatches(response.data);
           });
 
-        console.log(batches, "THEBATCH");
-        console.log(tempBatches);
         setPosts(postsData.purchaseOrderItems);
       } else {
         const currentDate = new Date()
@@ -97,6 +99,22 @@ const StockReceiving = ({ userData }) => {
     );
   };
 
+  const handleEditButtonClick = (item) => {
+    setEditableItems([item]);
+  };
+
+  const handleInputChange = (event, item) => {
+    const { name, value } = event.target;
+    setEditedValues((prevValues) => ({
+      ...prevValues,
+      [item.id]: {
+        ...prevValues[item.id],
+        [name]: value,
+      },
+    }));
+  };
+
+
   const addLine = (barcodeValue) => {
     setBatch([...batch, barcodeValue]);
   };
@@ -117,30 +135,7 @@ const StockReceiving = ({ userData }) => {
 
   // Function to submit the batch
   const handleSubmit = () => {
-    const currentDate = new Date();
-
-    const data = {
-      batch_name: batch[0],
-      received_date: currentDate.toISOString(), 
-      si_id: selected.SI_number, 
-      item_type: selected.item_type, 
-      items: [
-        {          
-        item_name: selected.Name, 
-        quantity: selected.quantity, 
-        order_id: selected.order_id
-        },
-      ],
-    };
-    
-    if (response.ok) {
-      console.log("Batch created successfully");
-      // Clear batch or perform any other necessary actions
-    } else {
-      console.error("Error creating batch:", response.statusText);
-      // Handle the error as needed
-    }
-
+    console.log("fuck",batch);
     if (selected.item_type == "Tablet") {
       setSelectedItem(selected);
       setIsDialogOpen(true);
@@ -148,19 +143,14 @@ const StockReceiving = ({ userData }) => {
       console.log("component or tablet");
     }
 
-
-    // TODO send the batch data to the backend WITH quantity
-    // clear batch
   };
 
   const handleRowClick = (data) => {
-    console.log("a",data);
-    console.log("bbbbbb",receivedGoodsData);
+    setFilteredBatches(newbatches.filter((element) => element.si_number == data.SI_number));
+    console.log("s",newbatches);
+    console.log("ss",filteredBatches);
+    console.log("sss",data);
 
-    setFilteredBatches(
-      receivedGoodsData.filter((element) => element.received_goods_id === data.SI_number)
-    );
-    console.log("ffff",filteredBatches);
     setSelected(data);
   };
 
@@ -286,7 +276,7 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{index + 1}</td>
                 <td style={tableCellStyle}>{item.Name}</td>
                 <td style={tableCellStyle}>{item.Quantity}</td>
-                <td style={tableCellStyle}>{item.item_id}</td>
+                <td style={tableCellStyle}>{item.SI_number}</td>
                 <td style={tableCellStyle}>{item.item_type}</td>
                 <td style={tableCellStyle}>
                   <button onClick={() => handleRowClick(item)}>Scan</button>
@@ -297,9 +287,11 @@ const StockReceiving = ({ userData }) => {
         </table>
         {isDialogOpen && (
           <BatchDialog
-            selectedItem={selectedItem}
+            selectedItem={selected}
             handleCloseDialog={handleCloseDialog}
             recieved_goods={receivedGoodsData}
+            userData={userId}
+            items={batch}
           />
         )}
       </div>

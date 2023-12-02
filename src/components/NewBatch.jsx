@@ -2,12 +2,16 @@ import { useState, useEffect } from "react";
 import "./NewBatch.css";
 import { current } from "@reduxjs/toolkit";
 
+// USEr
+
 export default function BatchDialog({
   selectedItem,
   handleCloseDialog,
   recieved_goods,
+  userData,
+  items,
+
 }) {
-  console.log(recieved_goods, "CMONS2");
   const [recievedGoodsData, setRecievedGoods] = useState([]);
   const [formData, setFormData] = useState({});
   const [formQuantityLimit, setQuantity] = useState(selectedItem.Quantity);
@@ -22,6 +26,8 @@ export default function BatchDialog({
       console.log(formData, "formdatassss");
     }
     if (recieved_goods) {
+      console.log(recieved_goods, "CMONS2");
+
       setRecievedGoods(recieved_goods[0]);
     }
   }, [selectedItem]);
@@ -32,8 +38,10 @@ export default function BatchDialog({
       received_date: currentDate, // Consider formatting the date as required by your backend
       batch_name: formData.Name,
       si_number: formData.SI_number, // Ensure the correct case for keys
-      createdBy: "KR35aNh3lfPeJbs7bp9rQ1j0be22",
+      createdBy: userData,
       received_goods_received_goods_id: recievedGoodsData.received_goods_id,
+      items:items,
+      formData
     };
 
     try {
