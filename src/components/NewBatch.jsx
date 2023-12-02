@@ -44,6 +44,13 @@ export default function BatchDialog({
       formData
     };
 
+    const itemData = {
+      received_goods_received_goods_id: recievedGoodsData.received_goods_id,
+      Name: formData.Name,
+      Quantity: formData.Quantity,
+      SI_number: formData.SI_number, 
+    };
+
     try {
       const response = await fetch("http://localhost:3001/batches", {
         method: "POST",
@@ -53,6 +60,15 @@ export default function BatchDialog({
         body: JSON.stringify(batchData),
       });
 
+
+
+      const itemResponse = await fetch("http://localhost:3001/received_goods_items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(itemData),
+      });
       if (!response.ok) {
         throw new Error("Error creating batch");
       }

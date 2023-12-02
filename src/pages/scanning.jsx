@@ -201,6 +201,7 @@ const StockReceiving = ({ userData }) => {
             <th style={tableHeaderStyle}>Name</th>
             <th style={tableHeaderStyle}>Made by</th>
             <th style={tableHeaderStyle}>Date</th>
+            
             <th style={tableHeaderStyle}>Edit</th>
           </tr>
         </thead>
