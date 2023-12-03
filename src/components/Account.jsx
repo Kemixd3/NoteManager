@@ -1,11 +1,11 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import "./Account.css";
-import { auth } from "../firebaseClient";
+
 //import { useSelector } from "react-redux";
 //import { selectDarkMode } from "../store/darkModeSlice";
 
-const Account = ({ user, userData, onLogout }) => {
+const Account = ({ user, userData }) => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
@@ -47,7 +47,7 @@ const Account = ({ user, userData, onLogout }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3001/users/users/${user.uid}`,
+        `http://localhost:3001/users/users/${user.id}`,
         {
           method: "PATCH",
           headers: {
@@ -72,7 +72,7 @@ const Account = ({ user, userData, onLogout }) => {
 
       //await setDoc(doc(firestore, "profiles", user.uid), updates);
     } catch (error) {
-      alert("awdawdwadwad", error.message);
+      console.log(error.message);
     } finally {
       setLoading(false);
     }
@@ -80,8 +80,8 @@ const Account = ({ user, userData, onLogout }) => {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
-      console.log(onLogout);
+      //await auth.signOut();
+      console.log("need logout function");
       //onLogout(); //TODO make callback function to handle logout in parent component
     } catch (error) {
       alert("awddawdawd", error.message);
@@ -128,6 +128,7 @@ const Account = ({ user, userData, onLogout }) => {
               Update profile
             </button>
           </div>
+
           <button
             onClick={handleLogout}
             type="submit"

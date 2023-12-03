@@ -10,7 +10,9 @@ function NavbarDisplay({ user, userData }) {
   //  if (postMountStoreState !== this.state.userData) {
   //    this.setState({ storeState: postMountStoreState })
   //}
-  console.log(userData);
+  console.log(userData, "NAVBAR1");
+  console.log(user, "NAVBAR2");
+
   //const userData = useSelector((state) => state.userData);
 
   if (user) {
@@ -30,7 +32,9 @@ function NavbarDisplay({ user, userData }) {
             <Nav>
               {user && userData && userData.userImage ? (
                 <Nav.Link style={{ color: "black" }} href="/account">
-                  <span className="me-2">Signed in as: {user.email}</span>
+                  <span className="me-2">
+                    Signed in as: {userData.userEmail}
+                  </span>
                   <span className="me-5">In {userData.userOrg} </span>
                   <Image
                     src={userData.userImage}

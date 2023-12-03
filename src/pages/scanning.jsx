@@ -7,8 +7,8 @@ const StockReceiving = ({ userData }) => {
   const [post, setPost] = React.useState(null);
   const [selected, setSelected] = useState([]);
   const [newbatches, newsetAllBatches] = useState([]);
-  const [editableItems, setEditableItems] = useState([]);  // State to track editable items
-  const [editedValues, setEditedValues] = useState({}); 
+  const [editableItems, setEditableItems] = useState([]); // State to track editable items
+  const [editedValues, setEditedValues] = useState({});
   const [batch, setBatch] = useState([]);
   const [batches, setAllBatches] = useState([]);
   const [filteredBatches, setFilteredBatches] = useState([]);
@@ -16,11 +16,8 @@ const StockReceiving = ({ userData }) => {
   const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
 
-
   const [SelectedBatchItems, setSelectedBatchItems] = useState([]);
-  const [EditableItemsInBatch, setEditableItemsInBatch] = useState([]);  // State to track editable items
-
-  
+  const [EditableItemsInBatch, setEditableItemsInBatch] = useState([]); // State to track editable items
 
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
@@ -45,9 +42,8 @@ const StockReceiving = ({ userData }) => {
 
       const receivedData = await receivedGoods.json();
 
-
       if (!receivedData.message) {
-        console.log("receivedData",receivedData);
+        console.log("receivedData", receivedData);
         setReceivedGoods(receivedData.receivedGoods);
 
         let tempBatches = [];
@@ -108,40 +104,33 @@ const StockReceiving = ({ userData }) => {
     setEditableItems([item]);
   };
 
-
-
-
-
-
-  
   const handleItemSaveButtonClick = (item) => {
     setEditableItemsInBatch((SelectedBatchItems) =>
-      SelectedBatchItems.filter((EditableItemsInBatch) => EditableItemsInBatch !== item)
+      SelectedBatchItems.filter(
+        (EditableItemsInBatch) => EditableItemsInBatch !== item
+      )
     );
   };
 
-const handleItemSelectButtonClick = async (item) => {
-  console.log("item", item);
+  const handleItemSelectButtonClick = async (item) => {
+    console.log("item", item);
 
-  try {
-    const response = await fetch(`/received_goods_items?received_goods_id=${item.received_goods_received_goods_id}&si_number=${item.si_number}`);
-    
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data);
-      setSelectedBatchItems([item]);
-    } else {
-      console.error('Failed to fetch data:', response.statusText);
+    try {
+      const response = await fetch(
+        `/received_goods_items?received_goods_id=${item.received_goods_received_goods_id}&si_number=${item.si_number}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setSelectedBatchItems([item]);
+      } else {
+        console.error("Failed to fetch data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
     }
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
-
-
-
-
-
+  };
 
   const handleInputChange = (event, item) => {
     const { name, value } = event.target;
@@ -153,7 +142,6 @@ const handleItemSelectButtonClick = async (item) => {
       },
     }));
   };
-
 
   const addLine = (barcodeValue) => {
     setBatch([...batch, barcodeValue]);
@@ -175,19 +163,19 @@ const handleItemSelectButtonClick = async (item) => {
 
   // Function to submit the batch
   const handleSubmit = () => {
-    console.log("fuck",batch);
+    console.log("fuck", batch);
     if (selected.item_type == "Tablet") {
       setSelectedItem(selected);
       setIsDialogOpen(true);
     } else {
       console.log("component or tablet");
     }
-
   };
 
   const handleRowClick = (data) => {
-    setFilteredBatches(newbatches.filter((element) => element.si_number == data.SI_number));
-
+    setFilteredBatches(
+      newbatches.filter((element) => element.si_number == data.SI_number)
+    );
 
     setSelected(data);
   };
@@ -231,8 +219,9 @@ const handleItemSelectButtonClick = async (item) => {
         </div>
       </div>
 
-
-      <div style={{ flex: 1, padding: "46px", position: "absolute", bottom: 0 }}>
+      <div
+        style={{ flex: 1, padding: "46px", position: "absolute", bottom: 0 }}
+      >
         <div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <tbody>
@@ -247,80 +236,92 @@ const handleItemSelectButtonClick = async (item) => {
       </div>
 
       <div style={{ flex: 1, padding: "46px" }}>
-      <h2>Batch Details</h2>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={tableHeaderStyle}>Line</th>
-            <th style={tableHeaderStyle}>Name</th>
-            <th style={tableHeaderStyle}>Made by</th>
-            <th style={tableHeaderStyle}>Date</th>
-            <td style={tableCellStyle}>Select</td>
+        <h2>Batch Details</h2>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={tableHeaderStyle}>Line</th>
+              <th style={tableHeaderStyle}>Name</th>
+              <th style={tableHeaderStyle}>Made by</th>
+              <th style={tableHeaderStyle}>Date</th>
+              <td style={tableCellStyle}>Select</td>
 
-            <th style={tableHeaderStyle}>Edit</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredBatches.map((item, index) => (
-            <tr key={index}>
-              <td style={tableCellStyle}>{index + 1}</td>
-
-              <td style={tableCellStyle}>
-                {editableItems.includes(item) ? (
-                  <input
-                    type="text"
-                    name="batch_name"
-                    value={editedValues[item.id]?.batch_name || item.batch_name}
-                    onChange={(event) => handleInputChange(event, item)}
-                  />
-                ) : (
-                  item.batch_name
-                )}
-              </td>
-              <td style={tableCellStyle}>
-                {editableItems.includes(item) ? (
-                  <input
-                    type="text"
-                    name="createdBy"
-                    value={editedValues[item.id]?.createdBy || item.createdBy}
-                    onChange={(event) => handleInputChange(event, item)}
-                  />
-                ) : (
-                  item.createdBy
-                )}
-              </td>
-              <td style={tableCellStyle}>
-                {editableItems.includes(item) ? (
-                  <input
-                    type="text"
-                    name="received_date"
-                    value={editedValues[item.id]?.received_date || item.received_date}
-                    onChange={(event) => handleInputChange(event, item)}
-                  />
-                ) : (
-                  item.received_date
-                )}
-              </td>
-              <td style={tableCellStyle}>
-                {editableItems.includes(item) ? (
-                  <button onClick={() => handleItemSaveButtonClick(item)}>Save</button>
-                ) : (
-                  <button onClick={() => handleItemSelectButtonClick(item)}>Select</button>
-                )}
-              </td>
-              <td style={tableCellStyle}>
-                {editableItems.includes(item) ? (
-                  <button onClick={() => handleSaveButtonClick(item)}>Save</button>
-                ) : (
-                  <button onClick={() => handleEditButtonClick(item)}>Edit</button>
-                )}
-              </td>
+              <th style={tableHeaderStyle}>Edit</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {filteredBatches.map((item, index) => (
+              <tr key={index}>
+                <td style={tableCellStyle}>{index + 1}</td>
 
+                <td style={tableCellStyle}>
+                  {editableItems.includes(item) ? (
+                    <input
+                      type="text"
+                      name="batch_name"
+                      value={
+                        editedValues[item.id]?.batch_name || item.batch_name
+                      }
+                      onChange={(event) => handleInputChange(event, item)}
+                    />
+                  ) : (
+                    item.batch_name
+                  )}
+                </td>
+                <td style={tableCellStyle}>
+                  {editableItems.includes(item) ? (
+                    <input
+                      type="text"
+                      name="createdBy"
+                      value={editedValues[item.id]?.createdBy || item.createdBy}
+                      onChange={(event) => handleInputChange(event, item)}
+                    />
+                  ) : (
+                    item.createdBy
+                  )}
+                </td>
+                <td style={tableCellStyle}>
+                  {editableItems.includes(item) ? (
+                    <input
+                      type="text"
+                      name="received_date"
+                      value={
+                        editedValues[item.id]?.received_date ||
+                        item.received_date
+                      }
+                      onChange={(event) => handleInputChange(event, item)}
+                    />
+                  ) : (
+                    item.received_date
+                  )}
+                </td>
+                <td style={tableCellStyle}>
+                  {editableItems.includes(item) ? (
+                    <button onClick={() => handleItemSaveButtonClick(item)}>
+                      Save
+                    </button>
+                  ) : (
+                    <button onClick={() => handleItemSelectButtonClick(item)}>
+                      Select
+                    </button>
+                  )}
+                </td>
+                <td style={tableCellStyle}>
+                  {editableItems.includes(item) ? (
+                    <button onClick={() => handleSaveButtonClick(item)}>
+                      Save
+                    </button>
+                  ) : (
+                    <button onClick={() => handleEditButtonClick(item)}>
+                      Edit
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <div style={{ flex: 1, padding: "46px" }}>
         <h2>Purchase Order Details</h2>

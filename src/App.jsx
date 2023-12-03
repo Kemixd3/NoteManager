@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 //import PropTypes from "prop-types";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Auth from "./pages/Auth";
+
 import HomePage from "./pages/home";
 
 import Account from "./components/Account";
 import StockReceiving from "./pages/scanning";
-import { auth } from "./firebaseClient";
+
 import NavbarDisplay from "./components/Nav";
 import "./frontcss.css";
 import { Provider } from "react-redux";
@@ -14,11 +14,13 @@ import { store } from "./store/store";
 //import { DarkModeProvider } from "./Context/DarkmodeContext";
 import POOversigt from "./oversigt";
 import { themes, getTheme, setTheme } from "./ThemeColors";
-console.log("a");
+import axios from "axios";
+
+import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 
 import { useUser } from "./Context/UserContext";
 
-export const App = () => {
+function App() {
   const {
     user,
     setUser,
@@ -28,16 +30,47 @@ export const App = () => {
     setIsLoadingUser,
   } = useUser();
 
-  //const [darkMode, setDarkMode] = useState(darkModeDefault);
-  useEffect(() => {
-    console.log("Works?");
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-      setIsLoadingUser(false);
-    });
+  const [token, setToken] = useState("");
 
-    return () => unsubscribe();
-  }, [setUser, setIsLoadingUser]);
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) =>
+      setUser(codeResponse) +
+      window.localStorage.setItem("emailForSignIn", codeResponse.access_token) +
+      setToken("initial"),
+
+    onError: (error) => console.log("Login Failed:", error),
+  });
+
+  //const [darkMode, setDarkMode] = useState(darkModeDefault);
+  const logOut = () => {
+    googleLogout();
+    window.localStorage.removeItem("emailForSignIn");
+    setUser({});
+  };
+
+  useEffect(() => {
+    console.log(user, "what is user?");
+    let stashedUser = window.localStorage.getItem("emailForSignIn");
+
+    if (stashedUser) {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${stashedUser}`,
+          {
+            headers: {
+              Authorization: `Bearer ${stashedUser}`,
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res.data, "OMG WORKS");
+
+          setUser(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [token]);
 
   const [currentTheme, nextTheme] = useState(getTheme());
 
@@ -50,9 +83,10 @@ export const App = () => {
     const getProfile = async () => {
       try {
         setIsLoadingUser(true);
+        console.log(user);
         if (user) {
           const getUser = await fetch(
-            "http://localhost:3001/users/users/" + user.uid
+            "http://localhost:3001/users/usersFromEmail/" + user.email
           );
 
           const response = await getUser.json();
@@ -97,60 +131,61 @@ export const App = () => {
     if (user) {
       getProfile();
     }
-  }, [user]);
+  }, [user, token]);
 
-  if (isLoadingUser) {
-    return <div className="loader"></div>;
-  }
+  //  if (isLoadingUser) {
+  //   return <div className="loader"></div>;
+  // }
 
   return (
     <div>
-      <Provider store={store}>
-        <div>
-          {userData && user && !isLoadingUser ? (
-            <div>
-              <NavbarDisplay user={user} userData={userData} />
-              <select
-                onChange={(event) => nextTheme(event.target.value)}
-                value={currentTheme}
-              >
-                {themes.map((theme, i) => (
-                  <option key={i} value={theme}>
-                    {theme}
-                  </option>
-                ))}
-              </select>
-              <BrowserRouter>
-                <Routes>
-                  <Route
-                    path="/"
-                    element={<HomePage user={user} userData={userData} />}
-                  />
-                  <Route
-                    path="/account"
-                    element={<Account user={user} userData={userData} />}
-                  />
-                  <Route
-                    path="/PO"
-                    element={<POOversigt userData={userData.userOrg} />}
-                  />
-                  <Route
-                    path="/scan/:id"
-                    element={<StockReceiving user={user} userData={userData} />}
-                  />
+      <div>
+        {userData && Object.keys(user).length != 0 && !isLoadingUser ? (
+          <div>
+            <NavbarDisplay user={user} userData={userData} />
+            <button onClick={logOut}>Log out</button>
+            <select
+              onChange={(event) => nextTheme(event.target.value)}
+              value={currentTheme}
+            >
+              {themes.map((theme, i) => (
+                <option key={i} value={theme}>
+                  {theme}
+                </option>
+              ))}
+            </select>
+            <BrowserRouter>
+              <Routes>
+                <Route
+                  path="/"
+                  element={<HomePage user={user} userData={userData} />}
+                />
+                <Route
+                  path="/account"
+                  element={<Account user={user} userData={userData} />}
+                />
+                <Route
+                  path="/PO"
+                  element={<POOversigt userData={userData.userOrg} />}
+                />
+                <Route
+                  path="/scan/:id"
+                  element={<StockReceiving user={user} userData={userData} />}
+                />
 
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </BrowserRouter>
-            </div>
-          ) : (
-            <Auth />
-          )}
-        </div>
-      </Provider>
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </BrowserRouter>
+          </div>
+        ) : (
+          <button onClick={() => login()}>Sign in with Google 🚀 </button>
+        )}
+      </div>
     </div>
   );
-};
+}
+
+export default App;
 
 //App.propTypes = {
 //  darkModeDefault: PropTypes.bool,
