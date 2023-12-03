@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 //import PropTypes from "prop-types";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Auth from "./pages/Auth";
+//import Auth from "./pages/Auth";
 import HomePage from "./pages/home";
 
 import Account from "./components/Account";
@@ -14,6 +14,8 @@ import { store } from "./store/store";
 //import { DarkModeProvider } from "./Context/DarkmodeContext";
 import POOversigt from "./oversigt";
 import { themes, getTheme, setTheme } from "./ThemeColors";
+import { jwtDecode } from "jwt-decode";
+
 console.log("a");
 
 import { useUser } from "./Context/UserContext";
@@ -29,15 +31,50 @@ export const App = () => {
   } = useUser();
 
   //const [darkMode, setDarkMode] = useState(darkModeDefault);
-  useEffect(() => {
-    console.log("Works?");
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-      setIsLoadingUser(false);
-    });
 
-    return () => unsubscribe();
-  }, [setUser, setIsLoadingUser]);
+  function handleSignOut(event) {
+    setUser({});
+    document.getElementById("signInDiv").hidden = false;
+  }
+
+  function handleCallbackResponse(response) {
+    const userObject = jwtDecode(response.credential);
+
+    setUser(userObject);
+    document.getElementById("signInDiv").hidden = true;
+    console.log(user.email, "USER??");
+  }
+
+  useEffect(() => {
+    const signInDiv = document.getElementById("signInDiv");
+
+    const initGoogleSignIn = () => {
+      if (
+        signInDiv &&
+        window.google &&
+        window.google.accounts &&
+        window.google.accounts.id
+      ) {
+        window.google.accounts.id.initialize({
+          client_id: "xxxxxxxx",
+          callback: handleCallbackResponse,
+        });
+
+        // Check if the element with ID "signInDiv" exists
+
+        if (signInDiv) {
+          window.google.accounts.id.renderButton(signInDiv, {
+            shape: "pill",
+          });
+        }
+        window.google.accounts.id.prompt();
+        console.log("Google Sign-In initialized");
+      } else {
+        setTimeout(initGoogleSignIn, 100);
+      }
+    };
+    initGoogleSignIn();
+  }, []);
 
   const [currentTheme, nextTheme] = useState(getTheme());
 
@@ -52,7 +89,7 @@ export const App = () => {
         setIsLoadingUser(true);
         if (user) {
           const getUser = await fetch(
-            "http://localhost:3001/users/users/" + user.uid
+            "http://localhost:3001/users/usersFromEmail/" + user.email
           );
 
           const response = await getUser.json();
@@ -62,7 +99,7 @@ export const App = () => {
             const UserData = {
               userId: user.uid,
               userName: response.user.name,
-              userEmail: response.user.email,
+              userEmail: user.email,
               userImage: response.user.image,
               userOrg: response.user.Organization,
             };
@@ -74,7 +111,7 @@ export const App = () => {
             await fetch("http://localhost:3001/users/post", {
               method: "POST",
               body: JSON.stringify({
-                userid: user.uid,
+                userid: user.sub,
                 name: "",
                 email: user.email,
                 image:
@@ -100,54 +137,57 @@ export const App = () => {
   }, [user]);
 
   if (isLoadingUser) {
-    return <div className="loader"></div>;
+    <div>
+      <h1>Not signed in</h1>
+    </div>;
   }
 
   return (
     <div>
-      <Provider store={store}>
-        <div>
-          {userData && user && !isLoadingUser ? (
-            <div>
-              <NavbarDisplay user={user} userData={userData} />
-              <select
-                onChange={(event) => nextTheme(event.target.value)}
-                value={currentTheme}
-              >
-                {themes.map((theme, i) => (
-                  <option key={i} value={theme}>
-                    {theme}
-                  </option>
-                ))}
-              </select>
-              <BrowserRouter>
-                <Routes>
-                  <Route
-                    path="/"
-                    element={<HomePage user={user} userData={userData} />}
-                  />
-                  <Route
-                    path="/account"
-                    element={<Account user={user} userData={userData} />}
-                  />
-                  <Route
-                    path="/PO"
-                    element={<POOversigt userData={userData.userOrg} />}
-                  />
-                  <Route
-                    path="/scan/:id"
-                    element={<StockReceiving user={user} userData={userData} />}
-                  />
+      <div id="signInDiv"></div>
 
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </BrowserRouter>
-            </div>
-          ) : (
-            <Auth />
-          )}
-        </div>
-      </Provider>
+      <div>
+        {userData && Object.keys(user).length != 0 ? (
+          <div>
+            <NavbarDisplay user={user} userData={userData} />
+            <button onClick={(e) => handleSignOut(e)} />
+            <select
+              onChange={(event) => nextTheme(event.target.value)}
+              value={currentTheme}
+            >
+              {themes.map((theme, i) => (
+                <option key={i} value={theme}>
+                  {theme}
+                </option>
+              ))}
+            </select>
+            <BrowserRouter>
+              <Routes>
+                <Route
+                  path="/"
+                  element={<HomePage user={user} userData={userData} />}
+                />
+                <Route
+                  path="/account"
+                  element={<Account user={user} userData={userData} />}
+                />
+                <Route
+                  path="/PO"
+                  element={<POOversigt userData={userData.userOrg} />}
+                />
+                <Route
+                  path="/scan/:id"
+                  element={<StockReceiving user={user} userData={userData} />}
+                />
+
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </BrowserRouter>
+          </div>
+        ) : (
+          <div id="signInDiv"></div>
+        )}
+      </div>
     </div>
   );
 };
