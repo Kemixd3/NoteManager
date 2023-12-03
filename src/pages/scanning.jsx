@@ -13,6 +13,8 @@ const StockReceiving = ({ userData }) => {
   const [batches, setAllBatches] = useState([]);
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [quantity, setQuantity] = useState([]);
+
   const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
 
@@ -23,7 +25,8 @@ const StockReceiving = ({ userData }) => {
   const { id } = useParams(); // Retrieve the ID from the route parameters
 
   const [userId, setUserId] = useState(userData.userId);
-  console.log(userId, "USER");
+
+  console.log(id, "USER");
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -116,9 +119,10 @@ const StockReceiving = ({ userData }) => {
     console.log("item", item);
 
     try {
+      //Virker men den finder ik Items der matcher params
       const response = await fetch(
-        `/received_goods_items?received_goods_id=${item.received_goods_received_goods_id}&si_number=${item.si_number}`
-      );
+        `http://localhost:3001/receiving/received_goods_items/${item.received_goods_received_goods_id}/${item.si_number}`
+        );
 
       if (response.ok) {
         const data = await response.json();
@@ -143,9 +147,10 @@ const StockReceiving = ({ userData }) => {
     }));
   };
 
-  const addLine = (barcodeValue) => {
-    setBatch([...batch, barcodeValue]);
+  const addLine = (barcodeValue, quantityValue) => {
+    setBatch([...batch, { barcode: barcodeValue, quantity: quantityValue }]);
   };
+  
 
   // Manual entry of barcode
   const handleManualEntry = (event) => {
@@ -163,7 +168,6 @@ const StockReceiving = ({ userData }) => {
 
   // Function to submit the batch
   const handleSubmit = () => {
-    console.log("fuck", batch);
     if (selected.item_type == "Tablet") {
       setSelectedItem(selected);
       setIsDialogOpen(true);
@@ -201,7 +205,14 @@ const StockReceiving = ({ userData }) => {
             value={barcode}
             onChange={handleManualEntry}
           />
-          <button onClick={() => addLine(barcode)}>Add Manually</button>
+          <input
+            type="text"
+            placeholder="Enter Quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+          />
+
+          <button onClick={() => addLine(barcode, quantity)}>Add Manually</button>
           <button onClick={handleScan}>Scan Barcode</button>
           <button onClick={handleSubmit}>Submit Batch</button>
         </div>
@@ -210,30 +221,30 @@ const StockReceiving = ({ userData }) => {
             <tbody>
               {batch.map((item, index) => (
                 <tr key={index}>
-                  <td style={tableCellStyle}>{index + 1}</td>
-                  <td style={tableCellStyle}>{item}</td>
+                  <td style={tableCellStyle}>{item.barcode}</td>
+                  <td style={tableCellStyle}>{item.quantity}</td>
                 </tr>
+              ))}
+              
+
+
+
+              {EditableItemsInBatch.map((item, index) => (
+                <tr key={index}>
+                  <td style={tableCellStyle}>{index+1}</td>
+                  <td style={tableCellStyle}>{item.barcode}</td>
+                  <td style={tableCellStyle}>{item.quantity}</td>                
+                </tr>
+
+
+
+
               ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      <div
-        style={{ flex: 1, padding: "46px", position: "absolute", bottom: 0 }}
-      >
-        <div>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <tbody>
-              {SelectedBatchItems.map((item, index) => (
-                <tr key={index}>
-                  <td style={tableCellStyle}>{index + 1}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
 
       <div style={{ flex: 1, padding: "46px" }}>
         <h2>Batch Details</h2>
