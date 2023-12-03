@@ -1,14 +1,18 @@
+// userReducer.js
 const initialState = {
-  userData: null,
+  user: {},
+  isLoadingUser: false,
 };
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "SET_USER_DATA":
+    case "SET_USER":
       return {
         ...state,
-        userData: action.payload,
+        user: action.payload,
       };
+    // handle other actions related to user state changes
+
     default:
       return state;
   }

@@ -1,43 +1,34 @@
 import { useState, useEffect } from "react";
 //import PropTypes from "prop-types";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
-import HomePage from "./pages/home";
-
-import Account from "./components/Account";
-import StockReceiving from "./pages/scanning";
-
+import Router from "./router";
 import NavbarDisplay from "./components/Nav";
 import "./frontcss.css";
-import { Provider } from "react-redux";
-import { store } from "./store/store";
-//import { DarkModeProvider } from "./Context/DarkmodeContext";
-import POOversigt from "./oversigt";
+import { Navigate } from "react-router-dom";
+
 import { themes, getTheme, setTheme } from "./ThemeColors";
 import axios from "axios";
-
+import { setUser, fetchUserData, setUserData } from "./actions/userActions";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 
-import { useUser } from "./Context/UserContext";
+import { useDispatch, useSelector } from "react-redux";
 
 function App() {
-  const {
-    user,
-    setUser,
-    userData,
-    setUserData,
-    isLoadingUser,
-    setIsLoadingUser,
-  } = useUser();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
+  const userData = useSelector((state) => state.userData.userData);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [token, setToken] = useState("");
 
   const login = useGoogleLogin({
-    onSuccess: (codeResponse) =>
-      setUser(codeResponse) +
-      window.localStorage.setItem("emailForSignIn", codeResponse.access_token) +
-      setToken("initial"),
-
+    onSuccess: (codeResponse) => {
+      dispatch(setUser(codeResponse));
+      window.localStorage.setItem("emailForSignIn", codeResponse.access_token);
+      setToken(codeResponse.access_token);
+      dispatch(fetchUserData(codeResponse.access_token));
+      // Store user authentication status in local storage
+      window.localStorage.setItem("isLoggedIn", "true");
+    },
     onError: (error) => console.log("Login Failed:", error),
   });
 
@@ -45,32 +36,8 @@ function App() {
   const logOut = () => {
     googleLogout();
     window.localStorage.removeItem("emailForSignIn");
-    setUser({});
+    dispatch(setUser({}));
   };
-
-  useEffect(() => {
-    console.log(user, "what is user?");
-    let stashedUser = window.localStorage.getItem("emailForSignIn");
-
-    if (stashedUser) {
-      axios
-        .get(
-          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${stashedUser}`,
-          {
-            headers: {
-              Authorization: `Bearer ${stashedUser}`,
-              Accept: "application/json",
-            },
-          }
-        )
-        .then((res) => {
-          console.log(res.data, "OMG WORKS");
-
-          setUser(res.data);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [token]);
 
   const [currentTheme, nextTheme] = useState(getTheme());
 
@@ -80,58 +47,14 @@ function App() {
   }, [currentTheme]);
 
   useEffect(() => {
-    const getProfile = async () => {
-      try {
-        setIsLoadingUser(true);
-        console.log(user);
-        if (user) {
-          const getUser = await fetch(
-            "http://localhost:3001/users/usersFromEmail/" + user.email
-          );
-
-          const response = await getUser.json();
-          console.log(response, "her!!!");
-
-          if (response.message !== "User not found") {
-            const UserData = {
-              userId: user.uid,
-              userName: response.user.name,
-              userEmail: response.user.email,
-              userImage: response.user.image,
-              userOrg: response.user.Organization,
-            };
-            setUserData(UserData);
-            setIsLoadingUser(false);
-          } else {
-            setIsLoadingUser(true);
-            console.log("NOT DIS");
-            await fetch("http://localhost:3001/users/post", {
-              method: "POST",
-              body: JSON.stringify({
-                userid: user.uid,
-                name: "",
-                email: user.email,
-                image:
-                  "https://media.licdn.com/dms/image/C560BAQHuF4hk-oVm4w/company-logo_200_200/0/1630637919310/uav_components_aps_logo?e=2147483647&v=beta&t=QrkJiLZuMdpNdWvF2jCSGUJZyUs-nrqfsHvXfQJZkrM",
-              }),
-              headers: {
-                "Content-type": "application/json; charset=UTF-8",
-              },
-            });
-
-            setIsLoadingUser(false);
-          }
-        }
-      } catch (error) {
-        alert(error.message);
-      } finally {
-        setIsLoadingUser(false);
-      }
-    };
-    if (user) {
-      getProfile();
+    const isLoggedIn = window.localStorage.getItem("isLoggedIn");
+    if (!isLoggedIn) {
+      // Redirect to login page if the user is not authenticated
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
     }
-  }, [user, token]);
+  }, []);
 
   //  if (isLoadingUser) {
   //   return <div className="loader"></div>;
@@ -140,7 +63,7 @@ function App() {
   return (
     <div>
       <div>
-        {userData && Object.keys(user).length != 0 && !isLoadingUser ? (
+        {isLoggedIn ? (
           <div>
             <NavbarDisplay user={user} userData={userData} />
             <button onClick={logOut}>Log out</button>
@@ -154,28 +77,8 @@ function App() {
                 </option>
               ))}
             </select>
-            <BrowserRouter>
-              <Routes>
-                <Route
-                  path="/"
-                  element={<HomePage user={user} userData={userData} />}
-                />
-                <Route
-                  path="/account"
-                  element={<Account user={user} userData={userData} />}
-                />
-                <Route
-                  path="/PO"
-                  element={<POOversigt userData={userData.userOrg} />}
-                />
-                <Route
-                  path="/scan/:id"
-                  element={<StockReceiving user={user} userData={userData} />}
-                />
 
-                <Route path="*" element={<Navigate to="/" />} />
-              </Routes>
-            </BrowserRouter>
+            <Router user={user} userData={userData}></Router>
           </div>
         ) : (
           <button onClick={() => login()}>Sign in with Google 🚀 </button>

@@ -1,11 +1,14 @@
-// store.js
+// store/store.js
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import thunk from "redux-thunk";
+import userReducer from "../reducers/userReducer";
+import userDataReducer from "../reducers/userDataReducer"; // Adjust the path accordingly
 
-import { configureStore } from "@reduxjs/toolkit";
-import darkModeReducer from "./darkModeSlice";
-
-export const store = configureStore({
-  reducer: {
-    darkMode: darkModeReducer,
-    // other reducers...
-  },
+const rootReducer = combineReducers({
+  user: userReducer,
+  userData: userDataReducer,
 });
+
+const store = createStore(rootReducer, applyMiddleware(thunk));
+
+export default store;
