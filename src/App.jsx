@@ -1,23 +1,10 @@
 import { useState, useEffect } from "react";
 //import PropTypes from "prop-types";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
-import HomePage from "./pages/home";
-
-import Account from "./components/Account";
-import StockReceiving from "./pages/scanning";
-
-import NavbarDisplay from "./components/Nav";
 import "./frontcss.css";
-import { Provider } from "react-redux";
-import { store } from "./store/store";
-//import { DarkModeProvider } from "./Context/DarkmodeContext";
-import POOversigt from "./oversigt";
 import { themes, getTheme, setTheme } from "./ThemeColors";
 import axios from "axios";
-
+import AuthenticatedView from "./components/AuthenticatedView";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
-
 import { useUser } from "./Context/UserContext";
 
 function App() {
@@ -29,7 +16,7 @@ function App() {
     isLoadingUser,
     setIsLoadingUser,
   } = useUser();
-
+  const [currentTheme, setCurrentTheme] = useState(getTheme());
   const [token, setToken] = useState("");
 
   const login = useGoogleLogin({
@@ -72,12 +59,13 @@ function App() {
     }
   }, [token]);
 
-  const [currentTheme, nextTheme] = useState(getTheme());
-
   useEffect(() => {
     setTheme(currentTheme);
-    console.log(currentTheme);
   }, [currentTheme]);
+
+  const handleThemeChange = (event) => {
+    setCurrentTheme(event.target.value);
+  };
 
   useEffect(() => {
     const getProfile = async () => {
@@ -104,7 +92,7 @@ function App() {
             setIsLoadingUser(false);
           } else {
             setIsLoadingUser(true);
-            console.log("NOT DIS");
+
             await fetch("http://localhost:3001/users/post", {
               method: "POST",
               body: JSON.stringify({
@@ -139,48 +127,17 @@ function App() {
 
   return (
     <div>
-      <div>
-        {userData && Object.keys(user).length != 0 && !isLoadingUser ? (
-          <div>
-            <NavbarDisplay user={user} userData={userData} />
-            <button onClick={logOut}>Log out</button>
-            <select
-              onChange={(event) => nextTheme(event.target.value)}
-              value={currentTheme}
-            >
-              {themes.map((theme, i) => (
-                <option key={i} value={theme}>
-                  {theme}
-                </option>
-              ))}
-            </select>
-            <BrowserRouter>
-              <Routes>
-                <Route
-                  path="/"
-                  element={<HomePage user={user} userData={userData} />}
-                />
-                <Route
-                  path="/account"
-                  element={<Account user={user} userData={userData} />}
-                />
-                <Route
-                  path="/PO"
-                  element={<POOversigt userData={userData.userOrg} />}
-                />
-                <Route
-                  path="/scan/:id"
-                  element={<StockReceiving user={user} userData={userData} />}
-                />
-
-                <Route path="*" element={<Navigate to="/" />} />
-              </Routes>
-            </BrowserRouter>
-          </div>
-        ) : (
-          <button onClick={() => login()}>Sign in with Google 🚀 </button>
-        )}
-      </div>
+      {userData && Object.keys(user).length !== 0 && !isLoadingUser ? (
+        <AuthenticatedView
+          user={user}
+          userData={userData}
+          handleLogout={logOut}
+          handleThemeChange={handleThemeChange}
+          currentTheme={currentTheme}
+        />
+      ) : (
+        <button onClick={() => login()}>Sign in with Google 🚀 </button>
+      )}
     </div>
   );
 }
