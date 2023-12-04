@@ -94,13 +94,14 @@ function App() {
 
           if (response.message !== "User not found") {
             const UserData = {
-              userId: user.uid,
+              userId: user.id,
               userName: response.user.name,
               userEmail: response.user.email,
               userImage: response.user.image,
               userOrg: response.user.Organization,
             };
             setUserData(UserData);
+            console.log(UserData, "THE USER DATA");
             setIsLoadingUser(false);
           } else {
             setIsLoadingUser(true);
