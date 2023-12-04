@@ -82,13 +82,12 @@ export default function BatchDialog({
       });
       const data = await response.json();
       console.log("Batch created successfully:", data);
+      handleCloseDialog();
 
       if (!response.ok) {
         throw new Error("Error creating batch");
       }
     }
-
-    await handleCloseDialog();
   };
 
   const validateQuantityChange = (e) => {

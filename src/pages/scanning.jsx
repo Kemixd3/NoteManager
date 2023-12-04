@@ -2,6 +2,7 @@ import React, { useState, useEffect, Dialog } from "react";
 import { useParams } from "react-router-dom";
 import BatchDialog from "../components/NewBatch";
 import axios from "axios";
+import "./scanning.css";
 
 const StockReceiving = ({ userData }) => {
   const [post, setPost] = React.useState(null);
@@ -14,23 +15,21 @@ const StockReceiving = ({ userData }) => {
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
   const [quantity, setQuantity] = useState([]);
-
   const [selectedBatch, setSelectedBatch] = useState({});
-
   const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
-
   const [EditableItemsInBatch, setEditableItemsInBatch] = useState([]); // State to track editable items
-
   const [barcode, setBarcode] = useState("");
   const { id } = useParams(); // Retrieve the ID from the route parameters
-
   const [userId, setUserId] = useState(userData.userId);
-
-  console.log(userData, "USER");
-
+  const [scannedBarcode, setScannedBarcode] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState({
+    batchDetails: null,
+    purchaseOrderDetails: null,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,6 +80,24 @@ const StockReceiving = ({ userData }) => {
     fetchData();
   }, [id, reload]);
 
+  useEffect(() => {
+    const handleBarcodeScan = (event) => {
+      //Get key code from the scanner
+      //scanner sends 'Enter' key after a scan:
+      if (event.keyCode === 13) {
+        //add line with the scanned barcode value
+        addLine(scannedBarcode);
+        setScannedBarcode("");
+      }
+    };
+
+    window.addEventListener("keydown", handleBarcodeScan);
+
+    return () => {
+      window.removeEventListener("keydown", handleBarcodeScan);
+    };
+  }, [scannedBarcode]);
+
   const handleSaveButtonClick = (item) => {
     console.log("Saving edited values:", editedValues[item.id]);
 
@@ -95,6 +112,17 @@ const StockReceiving = ({ userData }) => {
       .then((response) => {
         console.log(response.data);
         newsetAllBatches(response.data);
+
+        if (Object.keys(selected).length !== 0) {
+          setFilteredBatches(
+            response.data.filter(
+              (element) => element.si_number === selected.SI_number
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching batches:", error);
       });
   }
 
@@ -111,6 +139,15 @@ const StockReceiving = ({ userData }) => {
   };
 
   const handleItemSelectButtonClick = async (item) => {
+    const batchDetailsButtons = document.querySelectorAll(
+      ".batchDetailsButton"
+    );
+
+    //remove the class with grey color of all buttons with the class .batchDetailsButton
+    batchDetailsButtons.forEach((button) => {
+      button.classList.remove("defaultButtonStyle");
+    });
+
     setSelectedBatch(item);
 
     setBatchGoods([]);
@@ -124,14 +161,13 @@ const StockReceiving = ({ userData }) => {
         const data = await response.json();
         console.log(data);
         //setSelectedBatchItems(data.receivedGoodsItems);
-        setBatchGoods(data.receivedGoodsItems); // Assuming the response has a 'receivedGoodsItems' property
+        setBatchGoods(data.receivedGoodsItems);
       } else {
         const errorMessage = await response.text();
         console.error("Failed to fetch data:", response.status, errorMessage);
       }
     } catch (error) {
       console.error("Error:", error.message);
-      // Handle network errors or other exceptions
     }
   };
 
@@ -150,29 +186,16 @@ const StockReceiving = ({ userData }) => {
     console.log(selectedBatch.si_number);
 
     //FIX quantity and barcodeValue
+    console.log(batch, "BATCHES");
     setBatchGoods([
       ...batch,
       {
         Name: barcodeValue,
-        Quantity: 10,
+        Quantity: quantity || 1,
         createdBy: userId,
         SI_number: selectedBatch.si_number,
       },
     ]);
-  };
-
-  //Manual barcode
-  const handleManualEntry = (event) => {
-    const { value } = event.target;
-    setBarcode(value);
-  };
-
-  //Function to handle scanning
-  const handleScan = () => {
-    //TEST Simulating a scanned barcode value - FIX replace with actual scanning
-    const scannedBarcode = generateRandomBarcode();
-    setBarcode(scannedBarcode);
-    addLine(scannedBarcode);
   };
 
   //Function to select batch before batchDialog
@@ -187,47 +210,56 @@ const StockReceiving = ({ userData }) => {
 
   const handleRowClick = (data) => {
     //setSelectedBatchItems([]);
+    setSelectedBatch("");
     setBatchGoods([]);
     setFilteredBatches(
       newbatches.filter((element) => element.si_number == data.SI_number)
     );
-
     setSelected(data);
+
+    const batchDetailsButtons = document.querySelectorAll(
+      ".batchDetailsButton"
+    );
+
+    //Reset the background color of all buttons with the class .batchDetailsButton to the default grey
+    batchDetailsButtons.forEach((button) => {
+      button.classList.add("defaultButtonStyle");
+    });
+
+    setSelectedButtonIndex({ ...selectedButtonIndex, batchDetails: null });
   };
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
-    setSelectedItem(null); // Reset selected item
-  };
+    setSelectedItem(null);
 
-  // TEST function to generate a random barcode
-  const generateRandomBarcode = () => {
-    return Math.floor(Math.random() * 1000000000).toString();
+    getBatches(receivedGoodsData[0].received_goods_id);
   };
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <div style={{ flex: 1, padding: "46px" }}>
-        <button onClick={() => addLine(barcode, quantity, userId)}>
-          Add Manually
-        </button>
-        <button onClick={handleScan}>Scan Barcode</button>
-        <button onClick={handleSubmit}>Submit Batch</button>
+      <div style={{ flex: 1, padding: "0.5%" }}>
         <h2>Stock Receiving</h2>
         <div>
-          <input
-            type="text"
-            placeholder="Enter barcode manually"
-            value={barcode}
-            onChange={handleManualEntry}
-          />
-          <input
-            type="text"
-            placeholder="Enter Quantity"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-          />
+          {Object.keys(selectedBatch).length != 0 && (
+            <div>
+              <input
+                type="text"
+                placeholder="Enter Quantity"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+              <input
+                type="text"
+                value={scannedBarcode}
+                onChange={(e) => setScannedBarcode(e.target.value)}
+                placeholder="Scan Barcode Here"
+                autoFocus
+              />
+            </div>
+          )}
         </div>
+
         <div>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -250,9 +282,18 @@ const StockReceiving = ({ userData }) => {
             </tbody>
           </table>
         </div>
+        <button
+          onClick={() => {
+            handleSubmit();
+          }}
+        >
+          {Object.keys(selectedBatch).length !== 0
+            ? "Save Batch"
+            : "Submit Batch"}
+        </button>
       </div>
 
-      <div style={{ flex: 1, padding: "46px" }}>
+      <div style={{ flex: 1, padding: "0.5%" }}>
         <h2>Batch Details</h2>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
@@ -295,7 +336,22 @@ const StockReceiving = ({ userData }) => {
                       Save
                     </button>
                   ) : (
-                    <button onClick={() => handleItemSelectButtonClick(item)}>
+                    <button
+                      className="batchDetailsButton"
+                      onClick={() => {
+                        handleItemSelectButtonClick(item);
+                        setSelectedButtonIndex({
+                          ...selectedButtonIndex,
+                          batchDetails: index,
+                        });
+                      }}
+                      style={{
+                        backgroundColor:
+                          selectedButtonIndex.batchDetails === index
+                            ? "blue"
+                            : "",
+                      }}
+                    >
                       Select
                     </button>
                   )}
@@ -317,7 +373,7 @@ const StockReceiving = ({ userData }) => {
         </table>
       </div>
 
-      <div style={{ flex: 1, padding: "46px" }}>
+      <div style={{ flex: 1, padding: "0.5%" }}>
         <h2>Purchase Order Details</h2>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
@@ -339,7 +395,23 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.SI_number}</td>
                 <td style={tableCellStyle}>{item.item_type}</td>
                 <td style={tableCellStyle}>
-                  <button onClick={() => handleRowClick(item)}>Select</button>
+                  <button
+                    onClick={() => {
+                      handleRowClick(item);
+                      setSelectedButtonIndex({
+                        ...selectedButtonIndex,
+                        purchaseOrderDetails: index,
+                      });
+                    }}
+                    style={{
+                      backgroundColor:
+                        selectedButtonIndex.purchaseOrderDetails === index
+                          ? "blue"
+                          : "",
+                    }}
+                  >
+                    Select
+                  </button>
                 </td>
               </tr>
             ))}
@@ -373,6 +445,11 @@ const tableCellStyle = {
 
 export default StockReceiving;
 
+//<button onClick={() => addLine(barcode, quantity, userId)}>
+//Add Manually
+//</button>
+
+//  <button onClick={handleScan}>Scan Barcode</button>
 //{batch.map((item, index) => (
 //  <tr key={index}>
 //    <td style={tableCellStyle}>{item.barcode}</td>
