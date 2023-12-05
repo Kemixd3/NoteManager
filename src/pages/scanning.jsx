@@ -2,6 +2,7 @@ import React, { useState, useEffect, Dialog } from "react";
 import { useParams } from "react-router-dom";
 import BatchDialog from "../components/NewBatch";
 import EditDialog from "../components/editItem";
+import { Trash3Fill, FilePlusFill, GearFill } from "react-bootstrap-icons";
 
 import axios from "axios";
 import "./scanning.css";
@@ -30,7 +31,7 @@ const StockReceiving = ({ userData }) => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
-  
+
   const [selectedButtonIndex, setSelectedButtonIndex] = useState({
     batchDetails: null,
     purchaseOrderDetails: null,
@@ -131,6 +132,22 @@ const StockReceiving = ({ userData }) => {
       });
   }
 
+  function handleBatchDelete(batch_id) {
+    axios
+      .delete(`http://localhost:3001/batches/batches/${batch_id}`)
+      .then((response) => {
+        // Handle success message from the server
+        console.log("Batch deleted:", response.data.message);
+        // Optionally, update the UI or perform any necessary actions after successful deletion
+        getBatches(receivedGoodsData[0].received_goods_id);
+      })
+      .catch((error) => {
+        // Handle error cases
+        console.error("Error deleting batch:", error.message);
+        // Optionally, display an error message to the user or perform error-related actions
+      });
+  }
+
   const handleEditButtonClick = (item) => {
     setEditableItems([item]);
   };
@@ -143,36 +160,45 @@ const StockReceiving = ({ userData }) => {
     );
   };
 
+  const fetchReceivedGoodsItems = async (batchId, siNumber) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/receiving/received_goods_items/${batchId}/${siNumber}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setBatchGoods(data.receivedGoodsItems);
+        return data.receivedGoodsItems;
+      } else {
+        const errorMessage = await response.text();
+        throw new Error(
+          `Failed to fetch data: ${response.status} ${errorMessage}`
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching received goods items:", error.message);
+      throw error;
+    }
+  };
+
   const handleItemSelectButtonClick = async (item) => {
     const batchDetailsButtons = document.querySelectorAll(
       ".batchDetailsButton"
     );
 
-    //remove the class with grey color of all buttons with the class .batchDetailsButton
+    // Remove the class with grey color of all buttons with the class .batchDetailsButton
     batchDetailsButtons.forEach((button) => {
       button.classList.remove("defaultButtonStyle");
     });
 
     setSelectedBatch(item);
-
     setBatchGoods([]);
 
     try {
-      const response = await fetch(
-        `http://localhost:3001/receiving/received_goods_items/${item.batch_id}/${item.si_number}`
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        //setSelectedBatchItems(data.receivedGoodsItems);
-        setBatchGoods(data.receivedGoodsItems);
-      } else {
-        const errorMessage = await response.text();
-        console.error("Failed to fetch data:", response.status, errorMessage);
-      }
+      await fetchReceivedGoodsItems(item.batch_id, item.si_number);
     } catch (error) {
-      console.error("Error:", error.message);
+      // Handle error if needed
     }
   };
 
@@ -213,9 +239,8 @@ const StockReceiving = ({ userData }) => {
     }
   };
 
-
   const handleEditItem = async (item) => {
-    console.log("asdawd",item);
+    console.log("asdawd", item);
     setEditItem(item);
     setItemDialogOpen(true);
   };
@@ -253,6 +278,40 @@ const StockReceiving = ({ userData }) => {
     getBatches(receivedGoodsData[0].received_goods_id);
   };
 
+  async function deleteReceivingItem(line) {
+    try {
+      const response = await axios.delete(
+        `http://localhost:3001/receiving/received_goods_items/${line}`
+      );
+
+      if (response.status === 200) {
+        // Successful delete
+        console.log("Received goods item deleted successfully");
+
+        // Assuming fetchReceivedGoodsItems returns a promise
+        await fetchReceivedGoodsItems(
+          selectedBatch.batch_id,
+          selectedBatch.si_number
+        );
+      } else {
+        throw new Error("Failed to delete received goods item");
+      }
+    } catch (error) {
+      console.error("Error deleting received goods item:", error.message);
+    }
+  }
+  const trashIconStyle = {
+    cursor: "pointer",
+    color: "red", // Change the color to match your design
+    transition: "color 0.3s ease", // Add transition for smooth color change
+  };
+
+  const defaultIconStyle = {
+    cursor: "pointer",
+
+    transition: "color 0.3s ease", // Add transition for smooth color change
+  };
+
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <div style={{ flex: 1, padding: "0.5%" }}>
@@ -270,7 +329,7 @@ const StockReceiving = ({ userData }) => {
                 type="text"
                 value={scannedBarcode}
                 onChange={(e) => setScannedBarcode(e.target.value)}
-                placeholder="Scan Barcode Here"
+                placeholder="Scan here"
                 autoFocus
               />
             </div>
@@ -281,12 +340,12 @@ const StockReceiving = ({ userData }) => {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                <th style={tableHeaderStyle}>Line</th>
-                <th style={tableHeaderStyle}>Barcode*</th>
+                <th style={tableHeaderStyle}>#</th>
+                <th style={tableHeaderStyle}>Batch/Serial number*</th>
                 <th style={tableHeaderStyle}>Quantity</th>
                 <th style={tableHeaderStyle}>SI Number</th>
                 <th style={tableHeaderStyle}>Edit</th>
-
+                <th style={tableHeaderStyle}>Delete</th>
               </tr>
             </thead>
             <tbody>
@@ -297,22 +356,24 @@ const StockReceiving = ({ userData }) => {
                   <td style={tableCellStyle}>{item.Quantity}</td>
                   <td style={tableCellStyle}>{item.SI_number}</td>
                   <td style={tableCellStyle}>
-                  <button
-                    onClick={() => {
-                      handleEditItem(item);
-                    }}
-                  >
-                    Select
-                  </button>
-
-
-
-
-
-
-
-                  
-                </td>
+                    <GearFill
+                      size={33}
+                      className="batchDetailsButton"
+                      onClick={() => {
+                        handleEditItem(item);
+                      }}
+                      style={defaultIconStyle}
+                    />
+                  </td>
+                  <td style={tableCellStyle}>
+                    <Trash3Fill
+                      size={33}
+                      style={trashIconStyle}
+                      onClick={() => {
+                        deleteReceivingItem(item.received_item_id);
+                      }}
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -334,20 +395,19 @@ const StockReceiving = ({ userData }) => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              <th style={tableHeaderStyle}>Line</th>
+              <th style={tableHeaderStyle}>#</th>
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Made by</th>
               <th style={tableHeaderStyle}>SI Number</th>
-              <td style={tableCellStyle}>Select</td>
-
+              <th style={tableHeaderStyle}>Select</th>
               <th style={tableHeaderStyle}>Edit</th>
+              <th style={tableHeaderStyle}>Delete</th>
             </tr>
           </thead>
           <tbody>
             {filteredBatches.map((item, index) => (
               <tr key={index}>
                 <td style={tableCellStyle}>{index + 1}</td>
-
                 <td style={tableCellStyle}>
                   {editableItems.includes(item) ? (
                     <input
@@ -372,7 +432,8 @@ const StockReceiving = ({ userData }) => {
                       Save
                     </button>
                   ) : (
-                    <button
+                    <FilePlusFill
+                      size={40}
                       className="batchDetailsButton"
                       onClick={() => {
                         handleItemSelectButtonClick(item);
@@ -382,14 +443,13 @@ const StockReceiving = ({ userData }) => {
                         });
                       }}
                       style={{
-                        backgroundColor:
+                        ...defaultIconStyle,
+                        color:
                           selectedButtonIndex.batchDetails === index
                             ? "blue"
-                            : "",
+                            : "inherit", // Apply color separately
                       }}
-                    >
-                      Select
-                    </button>
+                    />
                   )}
                 </td>
                 <td style={tableCellStyle}>
@@ -398,10 +458,20 @@ const StockReceiving = ({ userData }) => {
                       Save
                     </button>
                   ) : (
-                    <button onClick={() => handleEditButtonClick(item)}>
-                      Edit
-                    </button>
+                    <GearFill
+                      size={33}
+                      style={defaultIconStyle}
+                      onClick={() => handleEditButtonClick(item)}
+                    />
                   )}
+                </td>
+
+                <td style={tableCellStyle}>
+                  <Trash3Fill
+                    size={33}
+                    style={trashIconStyle}
+                    onClick={() => handleBatchDelete(item.batch_id)}
+                  />
                 </td>
               </tr>
             ))}
@@ -414,7 +484,7 @@ const StockReceiving = ({ userData }) => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              <th style={tableHeaderStyle}>Line</th>
+              <th style={tableHeaderStyle}>#</th>
               <th style={tableHeaderStyle}>Name</th>
               <th style={tableHeaderStyle}>Quantity</th>
               <th style={tableHeaderStyle}>SI Number</th>
@@ -431,7 +501,8 @@ const StockReceiving = ({ userData }) => {
                 <td style={tableCellStyle}>{item.SI_number}</td>
                 <td style={tableCellStyle}>{item.item_type}</td>
                 <td style={tableCellStyle}>
-                  <button
+                  <FilePlusFill
+                    size={40}
                     onClick={() => {
                       handleRowClick(item);
                       setSelectedButtonIndex({
@@ -440,14 +511,13 @@ const StockReceiving = ({ userData }) => {
                       });
                     }}
                     style={{
-                      backgroundColor:
+                      ...defaultIconStyle,
+                      color:
                         selectedButtonIndex.purchaseOrderDetails === index
                           ? "blue"
                           : "",
                     }}
-                  >
-                    Select
-                  </button>
+                  />
                 </td>
               </tr>
             ))}
@@ -463,13 +533,12 @@ const StockReceiving = ({ userData }) => {
             selectedBatch={selectedBatch}
           />
         )}
-      {itemDialogOpen && (
-        <EditDialog
-          edit={EditItem}
-          handleCloseDialog={handleCloseItemDialog}
-        />
-      )}
-
+        {itemDialogOpen && (
+          <EditDialog
+            edit={EditItem}
+            handleCloseDialog={handleCloseItemDialog}
+          />
+        )}
       </div>
     </div>
   );
