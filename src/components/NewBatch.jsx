@@ -32,7 +32,7 @@ export default function BatchDialog({
 
     if (items && items.length > 0) {
       const filteredItems = items.filter((item) => !item.received_item_id);
-
+      console.log(filteredItems, "THEONE");
       const requestBody = {
         batch_id: selectedBatch.batch_id,
         receivedGoodsItems: filteredItems,
@@ -53,6 +53,7 @@ export default function BatchDialog({
         if (response.ok) {
           const data = await response.json();
           console.log("Received goods items added:", data.message);
+          handleCloseDialog();
           // Perform any additional actions after successful addition of items
         } else {
           console.error("Failed to add received goods items:", response.status);

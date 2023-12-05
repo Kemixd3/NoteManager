@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import BatchDialog from "../components/NewBatch";
 import EditDialog from "../components/editItem";
 import { Trash3Fill, FilePlusFill, GearFill } from "react-bootstrap-icons";
+import { FormProvider, useForm } from "react-hook-form";
+import ScanForm from "../components/ScanForm";
 
 import axios from "axios";
 import "./scanning.css";
@@ -214,19 +216,27 @@ const StockReceiving = ({ userData }) => {
   };
 
   const addLine = (barcodeValue, quantityValue, userId) => {
-    console.log(selectedBatch.si_number);
-
-    //FIX quantity and barcodeValue
-    console.log(batch, "BATCHES");
-    setBatchGoods([
-      ...batch,
-      {
-        Name: barcodeValue,
-        Quantity: quantity || 1,
-        createdBy: userId,
-        SI_number: selectedBatch.si_number,
-      },
-    ]);
+    console.log(selectedBatch);
+    console.log(userData.userId, "userId");
+    console.log(barcodeValue, "barcodeValue");
+    console.log(quantityValue, "quantity");
+    if (
+      selectedBatch.si_number &&
+      quantityValue &&
+      userData.userId &&
+      receivedGoodsData[0].received_goods_id
+    ) {
+      setBatchGoods([
+        ...batch,
+        {
+          Name: barcodeValue,
+          Quantity: quantityValue || 1,
+          createdBy: userData.userId,
+          SI_number: selectedBatch.si_number || "error",
+          received_goods_id: receivedGoodsData[0].received_goods_id,
+        },
+      ]);
+    }
   };
 
   //Function to select batch before batchDialog
@@ -247,7 +257,7 @@ const StockReceiving = ({ userData }) => {
 
   const handleRowClick = (data) => {
     //setSelectedBatchItems([]);
-    setSelectedBatch("");
+    setSelectedBatch({});
     setBatchGoods([]);
     setFilteredBatches(
       newbatches.filter((element) => element.si_number == data.SI_number)
@@ -311,28 +321,17 @@ const StockReceiving = ({ userData }) => {
 
     transition: "color 0.3s ease", // Add transition for smooth color change
   };
-
+  const methods = useForm();
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <div style={{ flex: 1, padding: "0.5%" }}>
         <h2>Stock Receiving</h2>
+
         <div>
           {Object.keys(selectedBatch).length != 0 && (
-            <div>
-              <input
-                type="text"
-                placeholder="Enter Quantity"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-              <input
-                type="text"
-                value={scannedBarcode}
-                onChange={(e) => setScannedBarcode(e.target.value)}
-                placeholder="Scan here"
-                autoFocus
-              />
-            </div>
+            <FormProvider {...methods}>
+              <ScanForm addLine={addLine} />
+            </FormProvider>
           )}
         </div>
 
