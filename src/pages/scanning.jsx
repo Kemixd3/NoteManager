@@ -1,6 +1,8 @@
 import React, { useState, useEffect, Dialog } from "react";
 import { useParams } from "react-router-dom";
 import BatchDialog from "../components/NewBatch";
+import EditDialog from "../components/editItem";
+
 import axios from "axios";
 import "./scanning.css";
 
@@ -23,9 +25,12 @@ const StockReceiving = ({ userData }) => {
   const { id } = useParams(); // Retrieve the ID from the route parameters
   const [userId, setUserId] = useState(userData.userId);
   const [scannedBarcode, setScannedBarcode] = useState("");
+  const [EditItem, setEditItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [itemDialogOpen, setItemDialogOpen] = useState(false);
+  
   const [selectedButtonIndex, setSelectedButtonIndex] = useState({
     batchDetails: null,
     purchaseOrderDetails: null,
@@ -208,6 +213,13 @@ const StockReceiving = ({ userData }) => {
     }
   };
 
+
+  const handleEditItem = async (item) => {
+    console.log("asdawd",item);
+    setEditItem(item);
+    setItemDialogOpen(true);
+  };
+
   const handleRowClick = (data) => {
     //setSelectedBatchItems([]);
     setSelectedBatch("");
@@ -227,6 +239,11 @@ const StockReceiving = ({ userData }) => {
     });
 
     setSelectedButtonIndex({ ...selectedButtonIndex, batchDetails: null });
+  };
+
+  const handleCloseItemDialog = () => {
+    setItemDialogOpen(false);
+    setEditItem(null);
   };
 
   const handleCloseDialog = () => {
@@ -268,6 +285,8 @@ const StockReceiving = ({ userData }) => {
                 <th style={tableHeaderStyle}>Barcode*</th>
                 <th style={tableHeaderStyle}>Quantity</th>
                 <th style={tableHeaderStyle}>SI Number</th>
+                <th style={tableHeaderStyle}>Edit</th>
+
               </tr>
             </thead>
             <tbody>
@@ -277,6 +296,23 @@ const StockReceiving = ({ userData }) => {
                   <td style={tableCellStyle}>{item.Name}</td>
                   <td style={tableCellStyle}>{item.Quantity}</td>
                   <td style={tableCellStyle}>{item.SI_number}</td>
+                  <td style={tableCellStyle}>
+                  <button
+                    onClick={() => {
+                      handleEditItem(item);
+                    }}
+                  >
+                    Select
+                  </button>
+
+
+
+
+
+
+
+                  
+                </td>
                 </tr>
               ))}
             </tbody>
@@ -427,6 +463,13 @@ const StockReceiving = ({ userData }) => {
             selectedBatch={selectedBatch}
           />
         )}
+      {itemDialogOpen && (
+        <EditDialog
+          edit={EditItem}
+          handleCloseDialog={handleCloseItemDialog}
+        />
+      )}
+
       </div>
     </div>
   );
