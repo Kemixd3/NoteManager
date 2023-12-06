@@ -240,9 +240,16 @@ const StockReceiving = ({ userData }) => {
   };
 
   const handleEditItem = async (item) => {
-    console.log("asdawd", item);
-    setEditItem(item);
-    setItemDialogOpen(true);
+    posts.forEach(element => {
+      if (element.SI_number == item.SI_number){
+        console.log(item,element)
+        item.QuantityPO = element.Quantity;
+
+        setEditItem(item);
+        setItemDialogOpen(true);
+        //break
+      }
+    });
   };
 
   const handleRowClick = (data) => {

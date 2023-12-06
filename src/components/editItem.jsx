@@ -12,7 +12,8 @@ export default function EditDialog({
     SI_number: edit.SI_number,
     createdBy: edit.createdBy,
     received_goods_id:edit.received_goods_id,
-    received_item_id:edit.received_item_id
+    received_item_id:edit.received_item_id,
+    QuantityPO:edit.QuantityPO
   });
   console.log("sdawdawda",formData);
   const [recievedGoodsData, setRecievedGoods] = useState([]);
@@ -37,6 +38,8 @@ export default function EditDialog({
         Quantity: formData.Quantity,
         SI_number: formData.SI_number,
         createdBy: formData.createdBy,
+        QuantityPO: formData.QuantityPO,
+        received_goods_id: formData.received_goods_id
       }),
     });
 
