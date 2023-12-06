@@ -3,8 +3,11 @@ import HomePage from "./pages/home";
 import POOversigt from "./pages/oversigt";
 import Account from "./components/Account";
 import StockReceiving from "./pages/scanning";
+import { useAuth } from "./Context/AuthContext";
 
-function Router({ user, userData }) {
+function Router() {
+  const { user, userData } = useAuth();
+  console.log(user, userData, "ROUTER!!!!!");
   return (
     <BrowserRouter>
       <Routes>
