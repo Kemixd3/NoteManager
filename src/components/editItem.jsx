@@ -39,7 +39,8 @@ export default function EditDialog({
         SI_number: formData.SI_number,
         createdBy: formData.createdBy,
         QuantityPO: formData.QuantityPO,
-        received_goods_id: formData.received_goods_id
+        received_goods_id: formData.received_goods_id,
+        received_item_id:formData.received_item_id
       }),
     });
 
