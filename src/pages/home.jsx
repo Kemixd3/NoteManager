@@ -10,6 +10,7 @@ import "./home.css";
 export default function HomePage({ user, userData }) {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate
+  document.title = 'Home';
 
   useEffect(() => {
     async function getPosts() {

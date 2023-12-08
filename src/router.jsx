@@ -3,6 +3,8 @@ import HomePage from "./pages/home";
 import POOversigt from "./pages/oversigt";
 import Account from "./components/Account";
 import StockReceiving from "./pages/scanning";
+import Search from "./pages/search";
+
 import { useAuth } from "./Context/AuthContext";
 
 function Router() {
@@ -22,6 +24,10 @@ function Router() {
         <Route
           path="/PO"
           element={<POOversigt userData={userData.userOrg} />}
+        />
+        <Route
+          path="/search"
+          element={<Search userData={userData.userOrg} />}
         />
         <Route
           path="/scan/:id"

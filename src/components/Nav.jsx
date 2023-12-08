@@ -10,7 +10,6 @@ import { themes, getTheme, setTheme } from "../ThemeColors";
 function NavbarDisplay({ user, userData }) {
   const { logout } = useAuth();
   const [currentTheme, setCurrentTheme] = useState(getTheme());
-  console.log(user, "NAVBAR");
   useEffect(() => {
     setTheme(currentTheme);
   }, [currentTheme]);
@@ -30,7 +29,9 @@ function NavbarDisplay({ user, userData }) {
           <Navbar.Collapse className="collapse">
             <Nav className="me-auto">
               <Nav.Link href="/home">Home</Nav.Link>
-              <Nav.Link href="/PO">PO oversigt</Nav.Link>
+              <Nav.Link href="/PO">PO Overview</Nav.Link>
+              <Nav.Link href="/search">Search</Nav.Link>
+
             </Nav>
 
             <Nav>

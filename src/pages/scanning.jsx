@@ -33,6 +33,7 @@ const StockReceiving = ({ user, userData }) => {
     purchaseOrderDetails: null,
   });
   const methods = useForm();
+  document.title = 'Scanning';
 
   useEffect(() => {
     const fetchData = async () => {

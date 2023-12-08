@@ -190,6 +190,24 @@ nav {
   --color-shadow-muted: rgba(0, 0, 0, 0.05);
 }
 
+.search-container {
+  text-align: center;
+}
+
+.searchForm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table-container {
+  margin-top: 20px; /* Adjust the margin as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
 .light-theme {
   --brand: var(--brand-light);
   --text: var(--text-black);
