@@ -40,10 +40,10 @@ const setColorScheme = (theme = fallback) => {
 };
 
 const setTheme = (() => {
-  // it will load the last saved theme from the local storage
-  // or fallback to the first available one
-  // and then set it
-  // happens on page load once
+  //it will load the last saved theme from the local storage
+  //or fallback to the first available one
+  //and then set it
+  //happens on page load once
   setColorScheme(getTheme());
 
   return (theme) => {
