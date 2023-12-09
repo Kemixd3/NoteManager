@@ -1,50 +1,63 @@
-name: Deploy
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - UXVStockSystem
 
 on:
   push:
     branches:
       - release/production/1.0.0
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
           node-version: "18.x"
 
-      - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
 
-      - name: Build project
-        run: npm run build
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
 
-      - name: Upload production-ready build files
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
-          name: production-files
-          path: ./dist
+          name: node-app
+          path: release.zip
 
   deploy:
-    name: Deploy
-    needs: build
     runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: "Production"
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: production-files
-          path: ./dist
+          name: node-app
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+
+      - name: "Deploy to Azure Web App"
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          path: "./dist"
+          app-name: "UXVStockSystem"
+          slot-name: "Production"
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E126D7E0FAC9455F9D64FBF8190E4920 }}
