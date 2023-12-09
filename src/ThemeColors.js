@@ -14,15 +14,6 @@ export const colors = {
     color: "black",
     "--darker": "#3b5998",
   },
-  coffee: {
-    "--lightest": "#ece0d1",
-    "--light": "#dbc1ac",
-    "background-color": "white",
-    color: "black",
-    "--medium": "#967259",
-    "--dark": "#634832",
-    "--darker": "#38220f",
-  },
 };
 
 const themes = Object.keys(colors);
@@ -41,9 +32,6 @@ const setColorScheme = (theme = fallback) => {
     if (theme == "night") {
       document.body.classList.add("darkmode");
       document.body.classList.remove("lightmode");
-    } else if (theme == "coffee") {
-      document.body.classList.remove("darkmode");
-      document.body.classList.add("lightmode");
     } else {
       document.body.classList.remove("darkmode");
       document.body.classList.remove("lightmode");

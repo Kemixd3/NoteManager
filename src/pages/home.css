@@ -50,3 +50,7 @@
 .darkmode .gantt_grid_scale .gantt_grid_head_cell {
   color: #b0b3b8;
 }
+
+.page {
+  margin-top: 5%;
+}

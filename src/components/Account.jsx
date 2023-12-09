@@ -1,36 +1,26 @@
 import { useState, useEffect } from "react";
-
+import { updateProfile } from "../Controller/UserController";
 import "./Account.css";
-
-//import { useSelector } from "react-redux";
-//import { selectDarkMode } from "../store/darkModeSlice";
 
 const Account = ({ user, userData }) => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
   const [avatar_url, setAvatarUrl] = useState(null);
-  //const darkMode = useSelector(selectDarkMode);
-  document.title = 'Account';
-
-  console.log(userData, "account");
+  document.title = "Account";
 
   useEffect(() => {
     const getProfile = async () => {
       try {
         setLoading(true);
 
-        console.log(user, "her");
         if (userData != "User not found") {
-          // Now you can access individual fields from the data object
-          setUsername(userData.userName || "No name uploaded");
-          setEmail(user.email || "No email uploaded");
-          setAvatarUrl(userData.userImage || "No picture uploaded");
-          //console.log("DIS", response.user.image);
+          setUsername(userData.name || "No name uploaded"); //individual fields from the data object
+          setEmail(userData.email || "No email uploaded");
+          setAvatarUrl(userData.image || "No picture uploaded");
         } else {
           console.log("Error");
           setLoading(false);
-          //console.log("Profile document does not exist");
         }
       } catch (error) {
         alert(error.message);
@@ -40,38 +30,23 @@ const Account = ({ user, userData }) => {
     };
 
     getProfile();
-  }, [user]);
+  }, [userData]);
 
-  const updateProfile = async (e) => {
+  const updateUserProfile = async (e) => {
     e.preventDefault();
-
+    console.log(userData);
     try {
       setLoading(true);
-      const response = await fetch(
-        `http://localhost:3001/users/users/${user.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: username,
-            email: email,
-            image: avatar_url,
-          }),
-        }
+      const updatedUser = await updateProfile(
+        userData.userid,
+        username,
+        email,
+        avatar_url
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
-
-      // Update local state if the request was successful
-      setUsername(username);
-      setEmail(email);
-      setAvatarUrl(avatar_url);
-
-      //await setDoc(doc(firestore, "profiles", user.uid), updates);
+      setUsername(updatedUser.username);
+      setEmail(updatedUser.email);
+      setAvatarUrl(updatedUser.avatar_url);
     } catch (error) {
       console.log(error.message);
     } finally {
@@ -81,9 +56,7 @@ const Account = ({ user, userData }) => {
 
   const handleLogout = async () => {
     try {
-      //await auth.signOut();
       console.log("need logout function");
-      //onLogout(); //TODO make callback function to handle logout in parent component
     } catch (error) {
       alert("awddawdawd", error.message);
     }
@@ -94,15 +67,23 @@ const Account = ({ user, userData }) => {
       {loading ? (
         "Saving ..."
       ) : (
-        <form onSubmit={updateProfile} id="accountForm" className="form-widget">
+        <form
+          onSubmit={updateUserProfile}
+          id="accountForm"
+          className="form-widget"
+        >
           <div>
             <h4>{email}</h4>
           </div>
-
-          <img id="userImage" src={avatar_url} alt="User Avatar" />
           <div>
-            <label htmlFor="username">Name</label>
+            {" "}
+            <img id="userImage" src={avatar_url} alt="User Avatar" />
+          </div>
+
+          <b htmlFor="username">Name</b>
+          <div>
             <input
+              style={{ width: "20%" }}
               id="username"
               type="text"
               placeholder={username}
@@ -110,10 +91,10 @@ const Account = ({ user, userData }) => {
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
-
+          <b htmlFor="avatar_url">Image</b>
           <div>
-            <label htmlFor="avatar_url">image</label>
             <input
+              style={{ width: "20%" }}
               id="avatar_url"
               type="url"
               value={avatar_url || ""}
@@ -122,21 +103,20 @@ const Account = ({ user, userData }) => {
           </div>
           <div>
             <button
-              className="button primary block"
+              className="button primary block me-5"
               type="submit"
               disabled={loading}
             >
               Update profile
             </button>
+            <button
+              onClick={handleLogout}
+              type="submit"
+              className="button secondary"
+            >
+              Logout
+            </button>
           </div>
-
-          <button
-            onClick={handleLogout}
-            type="submit"
-            className="button secondary"
-          >
-            Logout
-          </button>
         </form>
       )}
     </div>

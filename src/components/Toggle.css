@@ -1,0 +1,80 @@
+.toggle-container {
+  position: relative;
+  display: inline-block;
+  top: 20%;
+  left: 50%;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle-checkbox {
+  display: none;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  height: 26px;
+  width: 56px;
+  background-color: #ccc;
+  border-radius: 30px;
+  transition: background-color 0.3s, transform 0.3s ease-in-out;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 2px;
+  bottom: 2px;
+
+  border-radius: 50%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.toggle-checkbox:checked + .toggle-slider {
+  background-color: rgb(107, 107, 107);
+}
+
+.toggle-checkbox:checked + .toggle-slider:before {
+  transform: translateX(30px);
+}
+/* Shift the icons when the checkbox is checked */
+.toggle-checkbox:checked + .toggle-slider + .toggle-icons {
+  transform: translateX(0px) !important;
+}
+/*Initial position for icons*/
+.toggle-icons {
+  display: flex;
+  margin-right: 5px;
+  justify-content: space-between;
+  z-index: 3;
+  transform: translateX(30px);
+  transition: transform 0.3s ease-in-out;
+}
+
+.icon-night,
+.icon-day {
+  font-size: 1.2em;
+}
+
+.dark .icon-night {
+  display: inline;
+}
+
+.dark .icon-day {
+  display: none;
+}
+
+.light .icon-night {
+  display: none;
+}
+
+.light .icon-day {
+  display: inline;
+}

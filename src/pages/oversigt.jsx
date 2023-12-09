@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import "./POOversigt.css";
-
-import Table from "@mui/material/Table";
+import Table from "@mui/material/Table"; //Testing out mui table libary
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
@@ -13,7 +12,7 @@ import { getPosts } from "../Controller/PurchaseOrderRoutes";
 
 const POOversigt = (userData) => {
   const [purchaseOrders, setpurchaseOrders] = useState([]);
-  document.title = 'PO Overview';
+  document.title = "PO Overview";
 
   useEffect(() => {
     if (userData.userData) {
@@ -35,7 +34,7 @@ const POOversigt = (userData) => {
 
   function createRow(order) {
     return {
-      desc: "Order details", // Provide meaningful data for each column
+      desc: "Order details", //data for each column
       order_id: order.order_id,
       Buyer: order.Buyer,
       notes: order.notes,

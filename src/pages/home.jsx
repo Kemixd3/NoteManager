@@ -3,14 +3,14 @@ import "dhtmlx-gantt";
 import { getPosts } from "../Controller/PurchaseOrderRoutes";
 import "dhtmlx-gantt/codebase/skins/dhtmlxgantt_contrast_white.css";
 import { useAuth } from "../Context/AuthContext";
-import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
+import { useNavigate } from "react-router-dom";
 import "./home.css";
 
 export default function HomePage({ userData }) {
   const [posts, setPosts] = useState([]);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const { user } = useAuth();
-  document.title = 'Home';
+  document.title = "Home";
 
   useEffect(() => {
     if (userData && userData.Organization) {
@@ -41,24 +41,23 @@ export default function HomePage({ userData }) {
 
     var dateToStr = gantt.date.date_to_str(gantt.config.task_date);
     var markerId = gantt.addMarker({
-      start_date: new Date(), //a Date object that sets the marker's date
+      start_date: new Date(), //a Date object that sets the markers date
       css: "today", //a CSS class applied to the marker
       text: "Now", //the marker title
-      title: dateToStr(new Date()), // the marker's tooltip
+      title: dateToStr(new Date()), //the markers tooltip
     });
 
     // Load data into the gantt chart
     gantt.parse({ data: ganttData });
     gantt.getMarker(markerId);
-    // Attach event handler for task click
+    //Attach event handler for task click
     gantt.attachEvent("onTaskClick", (id, e) => {
-      // Prevent default behavior
       e.preventDefault();
 
-      // Get the order_id from the clicked task
+      //Get the order_id from the clicked task
       const clickedOrderId = id.toString(); // Convert to string
 
-      // Navigate to /scan/order.id
+      //Navigate to /scan/order.id
       navigate(`/scan/${clickedOrderId}`);
     });
   }, [posts, navigate]);
@@ -66,6 +65,7 @@ export default function HomePage({ userData }) {
   return (
     <section className="page">
       <section className="grid-container">
+        <h1 className="text-center mb-4">Incoming Receivings</h1>
         <div
           id="gantt-container"
           style={{ width: "100%", height: "400px" }}
