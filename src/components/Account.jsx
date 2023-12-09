@@ -11,6 +11,7 @@ const Account = ({ user, userData }) => {
   const [email, setEmail] = useState(null);
   const [avatar_url, setAvatarUrl] = useState(null);
   //const darkMode = useSelector(selectDarkMode);
+  document.title = 'Account';
 
   console.log(userData, "account");
 

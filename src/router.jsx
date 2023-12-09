@@ -3,8 +3,13 @@ import HomePage from "./pages/home";
 import POOversigt from "./pages/oversigt";
 import Account from "./components/Account";
 import StockReceiving from "./pages/scanning";
+import Search from "./pages/search";
 
-function Router({ user, userData }) {
+import { useAuth } from "./Context/AuthContext";
+
+function Router() {
+  const { user, userData } = useAuth();
+  console.log(user, userData, "ROUTER!!!!!");
   return (
     <BrowserRouter>
       <Routes>
@@ -19,6 +24,10 @@ function Router({ user, userData }) {
         <Route
           path="/PO"
           element={<POOversigt userData={userData.userOrg} />}
+        />
+        <Route
+          path="/search"
+          element={<Search userData={userData.userOrg} />}
         />
         <Route
           path="/scan/:id"

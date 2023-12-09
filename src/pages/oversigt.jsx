@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 
 const POOversigt = (userData) => {
   const [purchaseOrders, setpurchaseOrders] = useState([]);
+  document.title = 'PO Overview';
 
   useEffect(() => {
     const fetchData = async () => {

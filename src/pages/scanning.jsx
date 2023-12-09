@@ -1,43 +1,39 @@
-import React, { useState, useEffect, Dialog } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import BatchDialog from "../components/NewBatch";
 import EditDialog from "../components/editItem";
 import { Trash3Fill, FilePlusFill, GearFill } from "react-bootstrap-icons";
 import { FormProvider, useForm } from "react-hook-form";
 import ScanForm from "../components/ScanForm";
-
 import axios from "axios";
 import "./scanning.css";
 
-const StockReceiving = ({ userData }) => {
-  const [post, setPost] = React.useState(null);
+const StockReceiving = ({ user, userData }) => {
+  console.log("SCANNING PAGE", user, userData);
   const [selected, setSelected] = useState([]);
-  const [newbatches, newsetAllBatches] = useState([]);
-  const [editableItems, setEditableItems] = useState([]); // State to track editable items
+  const [batches, setAllBatches] = useState([]);
+  const [editableItems, setEditableItems] = useState([]);
   const [editedValues, setEditedValues] = useState({});
   const [batch, setBatchGoods] = useState([]);
-  const [batches, setAllBatches] = useState([]);
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [quantity, setQuantity] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState({});
   const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
-  const [EditableItemsInBatch, setEditableItemsInBatch] = useState([]); // State to track editable items
-  const [barcode, setBarcode] = useState("");
-  const { id } = useParams(); // Retrieve the ID from the route parameters
-  const [userId, setUserId] = useState(userData.userId);
+  const [EditableItemsInBatch, setEditableItemsInBatch] = useState([]);
+  const { id } = useParams(); //Get PO ID from the route
+  const [userId, setUserId] = useState(user.id);
   const [scannedBarcode, setScannedBarcode] = useState("");
   const [EditItem, setEditItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
-
   const [selectedButtonIndex, setSelectedButtonIndex] = useState({
     batchDetails: null,
     purchaseOrderDetails: null,
   });
+  const methods = useForm();
+  document.title = 'Scanning';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,8 +89,7 @@ const StockReceiving = ({ userData }) => {
       //Get key code from the scanner
       //scanner sends 'Enter' key after a scan:
       if (event.keyCode === 13) {
-        //add line with the scanned barcode value
-        addLine(scannedBarcode);
+        addLine(scannedBarcode); //add line with the scanned barcode value
         setScannedBarcode("");
       }
     };
@@ -119,7 +114,7 @@ const StockReceiving = ({ userData }) => {
       .get(`http://localhost:3001/batches/${received_goods_id}`)
       .then((response) => {
         console.log(response.data);
-        newsetAllBatches(response.data);
+        setAllBatches(response.data);
 
         if (Object.keys(selected).length !== 0) {
           setFilteredBatches(
@@ -134,21 +129,14 @@ const StockReceiving = ({ userData }) => {
       });
   }
 
-  function handleBatchDelete(batch_id) {
-    axios
-      .delete(`http://localhost:3001/batches/batches/${batch_id}`)
-      .then((response) => {
-        // Handle success message from the server
-        console.log("Batch deleted:", response.data.message);
-        // Optionally, update the UI or perform any necessary actions after successful deletion
-        getBatches(receivedGoodsData[0].received_goods_id);
-      })
-      .catch((error) => {
-        // Handle error cases
-        console.error("Error deleting batch:", error.message);
-        // Optionally, display an error message to the user or perform error-related actions
-      });
-  }
+  const handleBatchDelete = async (batchId) => {
+    try {
+      await axios.delete(`http://localhost:3001/batches/batches/${batchId}`);
+      getBatches(receivedGoodsData[0].received_goods_id);
+    } catch (error) {
+      console.error("Error deleting batch:", error.message);
+    }
+  };
 
   const handleEditButtonClick = (item) => {
     setEditableItems([item]);
@@ -164,23 +152,12 @@ const StockReceiving = ({ userData }) => {
 
   const fetchReceivedGoodsItems = async (batchId, siNumber) => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `http://localhost:3001/receiving/received_goods_items/${batchId}/${siNumber}`
       );
-
-      if (response.ok) {
-        const data = await response.json();
-        setBatchGoods(data.receivedGoodsItems);
-        return data.receivedGoodsItems;
-      } else {
-        const errorMessage = await response.text();
-        throw new Error(
-          `Failed to fetch data: ${response.status} ${errorMessage}`
-        );
-      }
+      setBatchGoods(response.data.receivedGoodsItems);
     } catch (error) {
       console.error("Error fetching received goods items:", error.message);
-      throw error;
     }
   };
 
@@ -215,15 +192,11 @@ const StockReceiving = ({ userData }) => {
     }));
   };
 
-  const addLine = (barcodeValue, quantityValue, userId) => {
-    console.log(selectedBatch);
-    console.log(userData.userId, "userId");
-    console.log(barcodeValue, "barcodeValue");
-    console.log(quantityValue, "quantity");
+  const addLine = (barcodeValue, quantityValue) => {
     if (
       selectedBatch.si_number &&
       quantityValue &&
-      userData.userId &&
+      userId &&
       receivedGoodsData[0].received_goods_id
     ) {
       setBatchGoods([
@@ -231,7 +204,7 @@ const StockReceiving = ({ userData }) => {
         {
           Name: barcodeValue,
           Quantity: quantityValue || 1,
-          createdBy: userData.userId,
+          createdBy: userId,
           SI_number: selectedBatch.si_number || "error",
           received_goods_id: receivedGoodsData[0].received_goods_id,
         },
@@ -250,24 +223,21 @@ const StockReceiving = ({ userData }) => {
   };
 
   const handleEditItem = async (item) => {
-    posts.forEach(element => {
-      if (element.SI_number == item.SI_number){
-        console.log(item,element)
+    posts.forEach((element) => {
+      if (element.SI_number == item.SI_number) {
+        console.log(item, element);
         item.QuantityPO = element.Quantity;
-
         setEditItem(item);
         setItemDialogOpen(true);
-        //break
       }
     });
   };
 
   const handleRowClick = (data) => {
-    //setSelectedBatchItems([]);
     setSelectedBatch({});
     setBatchGoods([]);
     setFilteredBatches(
-      newbatches.filter((element) => element.si_number == data.SI_number)
+      batches.filter((element) => element.si_number == data.SI_number)
     );
     setSelected(data);
 
@@ -275,14 +245,14 @@ const StockReceiving = ({ userData }) => {
       ".batchDetailsButton"
     );
 
-    //Reset the background color of all buttons with the class .batchDetailsButton to the default grey
     batchDetailsButtons.forEach((button) => {
-      button.classList.add("defaultButtonStyle");
+      button.classList.add("defaultButtonStyle"); //Reset the background color of all buttons with the class .batchDetailsButton to the default grey
     });
 
     setSelectedButtonIndex({ ...selectedButtonIndex, batchDetails: null });
   };
 
+  //FIX THE NAMING HERE ON THESE TWO
   const handleCloseItemDialog = () => {
     setItemDialogOpen(false);
     setEditItem(null);
@@ -291,7 +261,6 @@ const StockReceiving = ({ userData }) => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedItem(null);
-
     getBatches(receivedGoodsData[0].received_goods_id);
   };
 
@@ -302,10 +271,7 @@ const StockReceiving = ({ userData }) => {
       );
 
       if (response.status === 200) {
-        // Successful delete
         console.log("Received goods item deleted successfully");
-
-        // Assuming fetchReceivedGoodsItems returns a promise
         await fetchReceivedGoodsItems(
           selectedBatch.batch_id,
           selectedBatch.si_number
@@ -317,18 +283,7 @@ const StockReceiving = ({ userData }) => {
       console.error("Error deleting received goods item:", error.message);
     }
   }
-  const trashIconStyle = {
-    cursor: "pointer",
-    color: "red", // Change the color to match your design
-    transition: "color 0.3s ease", // Add transition for smooth color change
-  };
 
-  const defaultIconStyle = {
-    cursor: "pointer",
-
-    transition: "color 0.3s ease", // Add transition for smooth color change
-  };
-  const methods = useForm();
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <div style={{ flex: 1, padding: "0.5%" }}>
@@ -550,6 +505,20 @@ const StockReceiving = ({ userData }) => {
   );
 };
 
+//CUSTOM STYLING
+
+const trashIconStyle = {
+  cursor: "pointer",
+  color: "red",
+  transition: "color 0.3s ease", //transition
+};
+
+const defaultIconStyle = {
+  cursor: "pointer",
+
+  transition: "color 0.3s ease",
+};
+
 const tableHeaderStyle = {
   border: "1px solid #ddd",
   padding: "8px",
@@ -562,31 +531,3 @@ const tableCellStyle = {
 };
 
 export default StockReceiving;
-
-//<button onClick={() => addLine(barcode, quantity, userId)}>
-//Add Manually
-//</button>
-
-//  <button onClick={handleScan}>Scan Barcode</button>
-//{batch.map((item, index) => (
-//  <tr key={index}>
-//    <td style={tableCellStyle}>{item.barcode}</td>
-//    <td style={tableCellStyle}>{item.quantity}</td>
-//  </tr>
-// ))}
-
-//          <td style={tableCellStyle}>
-//        </td>            {editableItems.includes(item) ? (
-//              <input
-//                type="text"
-//                name="received_date"
-//                value={
-//                  editedValues[item.id]?.received_date ||
-//                  item.received_date
-//                }
-//                onChange={(event) => handleInputChange(event, item)}
-//              />
-//            ) : (
-//              item.received_date
-//          )}
-//          </td>
