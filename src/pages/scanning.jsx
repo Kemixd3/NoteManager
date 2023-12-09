@@ -91,8 +91,8 @@ const StockReceiving = ({ user, userData }) => {
     };
   }, [scannedBarcode]);
 
-  async function getBatches(received_goods_id, si_number) {
-    fetchBatches(received_goods_id, si_number)
+  async function getBatches(si_number) {
+    fetchBatches(si_number)
       .then((data) => {
         setAllBatches(data);
         if (data) {
@@ -196,7 +196,7 @@ const StockReceiving = ({ user, userData }) => {
   };
 
   const handleRowClick = (data) => {
-    getBatches(Reseived_goods_id, data.SI_number);
+    getBatches(data.SI_number);
 
     setSelectedBatch({});
     setBatchGoods([]);
@@ -224,7 +224,7 @@ const StockReceiving = ({ user, userData }) => {
   const handleBatchDelete = async (batchId) => {
     await deleteBatch(batchId)
       .then(() => {
-        getBatches(receivedGoodsData[0].received_goods_id, selected.SI_number);
+        getBatches(selected.SI_number);
       })
       .catch((error) => {
         console.error(error);
@@ -243,7 +243,7 @@ const StockReceiving = ({ user, userData }) => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedItem(null);
-    getBatches(receivedGoodsData[0].received_goods_id, selected.SI_number);
+    getBatches(selected.SI_number);
   };
 
   async function deleteReceivingItem(line) {

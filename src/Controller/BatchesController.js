@@ -2,11 +2,11 @@ import axios from "axios";
 
 const token = sessionStorage.getItem("token");
 
-async function fetchBatches(receivedGoodsId, siNumber) {
-  console.log("fetchBatches", receivedGoodsId, siNumber);
+async function fetchBatches(siNumber) {
+  console.log("fetchBatches", siNumber);
   try {
     const response = await axios.get(
-      `http://localhost:3001/batches/${receivedGoodsId}/${siNumber}`,
+      `http://localhost:3001/batches/${siNumber}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
