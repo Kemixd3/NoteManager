@@ -53,4 +53,4 @@ jobs:
           app-name: "SemesterAPI"
           slot-name: "Production"
           package: ${{ github.workspace }}/release.zip
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2C1305D798CF4CDB8D43AD8F3BA76DE8 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E126D7E0FAC9455F9D64FBF8190E4920 }}
