@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "http://localhost:3001";
+const baseUrl = "https://semesterapi.azurewebsites.net";
 const token = sessionStorage.getItem("token");
 
 async function fetchBatches(receivedGoodsId, siNumber) {
