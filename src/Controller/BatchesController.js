@@ -1,12 +1,12 @@
 import axios from "axios";
-
+const baseUrl = "http://localhost:3001";
 const token = sessionStorage.getItem("token");
 
 async function fetchBatches(receivedGoodsId, siNumber) {
   console.log("fetchBatches", receivedGoodsId, siNumber);
   try {
     const response = await axios.get(
-      `http://localhost:3001/batches/${receivedGoodsId}/${siNumber}`,
+      `${baseUrl}/batches/${receivedGoodsId}/${siNumber}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -23,7 +23,7 @@ async function fetchBatches(receivedGoodsId, siNumber) {
 
 async function deleteBatch(batchId) {
   try {
-    await axios.delete(`http://localhost:3001/batches/batches/${batchId}`, {
+    await axios.delete(`${baseUrl}/batches/batches/${batchId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -36,15 +36,11 @@ async function deleteBatch(batchId) {
 
 async function UpdateBatch(batchId, batchData) {
   try {
-    await axios.put(
-      `http://localhost:3001/batches/batches/${batchId}`,
-      batchData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    await axios.put(`${baseUrl}/batches/batches/${batchId}`, batchData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   } catch (error) {
     console.error("Error updating batch:", error.message);
     throw new Error("Failed to update batch");

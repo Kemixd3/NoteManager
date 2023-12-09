@@ -1,11 +1,12 @@
 import axios from "axios";
 const SecretToken = sessionStorage.getItem("token");
+const baseUrl = "http://localhost:3001";
 
 async function getUserFromEmail(email) {
   try {
     const storedToken = sessionStorage.getItem("token");
     const response = await axios.get(
-      `http://localhost:3001/users/usersFromEmail/${email}`,
+      `${baseUrl}/users/usersFromEmail/${email}`,
       {
         headers: {
           Authorization: `Bearer ${storedToken}`,
@@ -30,7 +31,7 @@ async function getUserFromEmail(email) {
 
 const updateProfile = async (id, username, email, avatar_url) => {
   try {
-    const response = await fetch(`http://localhost:3001/users/users/${id}`, {
+    const response = await fetch(`${baseUrl}/users/users/${id}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${SecretToken}`, // Assuming user object contains a valid token

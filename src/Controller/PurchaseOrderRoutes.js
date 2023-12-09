@@ -1,11 +1,11 @@
 const token = sessionStorage.getItem("token");
 import axios from "axios";
-
+const baseUrl = "http://localhost:3001";
 async function getPosts(org) {
   try {
     if (token && token !== "Bearer null") {
       const response = await axios.get(
-        `http://localhost:3001/orders/purchase-orders?org=${org}`,
+        `${baseUrl}/orders/purchase-orders?org=${org}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -28,7 +28,7 @@ async function getPosts(org) {
 async function fetchPurchaseOrderItems(id) {
   try {
     const response = await axios.get(
-      `http://localhost:3001/orders/purchase-order-items/${id}`,
+      `${baseUrl}/orders/purchase-order-items/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

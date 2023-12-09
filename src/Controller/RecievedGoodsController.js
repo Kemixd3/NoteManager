@@ -1,10 +1,10 @@
 import axios from "axios";
 const token = sessionStorage.getItem("token");
-
+const baseUrl = "http://localhost:3001";
 async function fetchReceivedGoods(id, userOrg) {
   try {
     const response = await axios.get(
-      `http://localhost:3001/receiving/received-goods/${id}/${userOrg}`,
+      `${baseUrl}/receiving/received-goods/${id}/${userOrg}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -23,7 +23,7 @@ async function postReceivedGoods(id, userOrg) {
   try {
     const currentDate = new Date().toISOString().slice(0, 19).replace("T", " ");
     const response = await axios.post(
-      "http://localhost:3001/receiving/received-goods",
+      `${baseUrl}/receiving/received-goods`,
       {
         received_date: currentDate,
         purchase_order_id: id,
@@ -50,7 +50,7 @@ async function postReceivedGoods(id, userOrg) {
 async function fetchReceivedGoodsItemsApi(batchId, siNumber) {
   try {
     const response = await axios.get(
-      `http://localhost:3001/receiving/received_goods_items/${batchId}/${siNumber}`,
+      `${baseUrl}/receiving/received_goods_items/${batchId}/${siNumber}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ async function fetchReceivedGoodsItemsApi(batchId, siNumber) {
 async function deleteReceivingItemApi(line) {
   try {
     const response = await axios.delete(
-      `http://localhost:3001/receiving/received_goods_items/${line}`,
+      `${baseUrl}/receiving/received_goods_items/${line}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ async function submitReceivedGoods(
       };
 
       response = await axios.post(
-        "http://localhost:3001/receiving/received_goods_items",
+        baseUrl + "/receiving/received_goods_items",
         requestBody,
         {
           headers: {
@@ -124,7 +124,7 @@ async function submitReceivedGoods(
         received_goods_received_goods_id: recievedGoodsData.received_goods_id,
       };
 
-      response = await axios.post("http://localhost:3001/batches", batchData, {
+      response = await axios.post(baseUrl + "/batches", batchData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
