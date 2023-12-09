@@ -5,70 +5,58 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { useAuth } from "../Context/AuthContext";
 import Image from "react-bootstrap/Image";
-import { themes, getTheme, setTheme } from "../ThemeColors";
+import { getTheme, setTheme } from "../ThemeColors";
+import ThemeToggle from "./ThemeToggle";
 
 function NavbarDisplay({ user, userData }) {
   const { logout } = useAuth();
-  const [currentTheme, setCurrentTheme] = useState(getTheme());
+  const [currentTheme] = useState(getTheme());
 
   useEffect(() => {
     setTheme(currentTheme);
   }, [currentTheme]);
 
-  const handleThemeChange = (event) => {
-    setCurrentTheme(event.target.value);
-  };
-
   if (user) {
     return (
       <Navbar expand="lg" data-testid="nav">
-        <Container>
-          <Navbar.Brand href="https://www.uxvtechnologies.com">
-            UXV Technologies
-          </Navbar.Brand>
+        <Container fluid>
+          <Navbar.Brand href="/">UXV Technologies Stock Receiving</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse className="collapse">
+          <Navbar.Collapse className="justify-content-between">
             <Nav className="me-auto">
               <Nav.Link href="/home">Home</Nav.Link>
               <Nav.Link href="/PO">PO Overview</Nav.Link>
               <Nav.Link href="/search">Search</Nav.Link>
-
             </Nav>
 
-            <Nav>
-              {user && userData && userData.image ? (
-                <Nav>
-                  <div>
-                    {" "}
-                    <select onChange={handleThemeChange} value={currentTheme}>
-                      {themes.map((theme, i) => (
-                        <option key={i} value={theme}>
-                          {theme}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <Nav.Link style={{ color: "black" }} href="/account">
-                    <span className="me-2">Signed in as: {userData.email}</span>
-                    <span className="me-5">In {userData.Organization} </span>
-                    <Image
-                      src={userData.image}
-                      alt="User Avatar"
-                      roundedCircle
-                      width="30"
-                      height="30"
-                      style={{ cursor: "pointer" }}
-                    />
-                  </Nav.Link>
-                  <button onClick={logout}>Log out</button>
-                </Nav>
-              ) : (
-                //fallback UI when user data is gone
-                <Nav.Link style={{ color: "black" }} href="#login">
-                  Sign In
+            {user && userData && userData.image ? (
+              <Nav className="align-items-center">
+                <Nav.Link href="/account">
+                  <span className="me-2">Signed in as: {userData.email}</span>
+                  <span className="me-2">In {userData.Organization}</span>
+                  <Image
+                    src={userData.image}
+                    alt="User Avatar"
+                    roundedCircle
+                    width="30"
+                    height="30"
+                    style={{ cursor: "pointer" }}
+                  />
                 </Nav.Link>
-              )}
-            </Nav>
+                <div className="me-5">
+                  <ThemeToggle />
+                </div>
+                <div>
+                  <button className="logout-btn ms-5" onClick={logout}>
+                    Log out
+                  </button>
+                </div>
+              </Nav>
+            ) : (
+              <Nav>
+                <Nav.Link href="#login">Sign In</Nav.Link>
+              </Nav>
+            )}
           </Navbar.Collapse>
         </Container>
       </Navbar>

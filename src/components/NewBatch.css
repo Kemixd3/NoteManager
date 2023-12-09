@@ -65,11 +65,11 @@ form button {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-/* Custom styles button */
+/* Custom styles button 
 form button:hover {
   background-color: #ddd;
 }
-
+*/
 /* Custom styles input field */
 input[type="text"] {
   width: 50%;

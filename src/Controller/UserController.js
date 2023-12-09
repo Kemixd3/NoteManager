@@ -1,25 +1,56 @@
 import axios from "axios";
+const SecretToken = sessionStorage.getItem("token");
 
 async function getUserFromEmail(email) {
   try {
+    const storedToken = sessionStorage.getItem("token");
     const response = await axios.get(
-      `http://localhost:3001/users/usersFromEmail/${email}`
+      `http://localhost:3001/users/usersFromEmail/${email}`,
+      {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      }
     );
 
-    const { user, token } = response.data; // Assuming the response contains user data and a token
+    const { user, token } = response.data; //response user data and token
 
-    // Store token in session storage if a new token is received
-    if (token && token !== "Bearer null") {
+    //Store JWT token in session storage if a new token is received
+    if (token && token !== "Token is valid") {
       sessionStorage.removeItem("token");
       sessionStorage.setItem("token", token);
     }
 
     return user;
   } catch (error) {
-    // Handle error
     console.error("Error fetching user:", error);
     return "Error fetching user";
   }
 }
 
-export { getUserFromEmail };
+const updateProfile = async (id, username, email, avatar_url) => {
+  try {
+    const response = await fetch(`http://localhost:3001/users/users/${id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${SecretToken}`, // Assuming user object contains a valid token
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: username,
+        email: email,
+        image: avatar_url,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update profile");
+    }
+
+    return { username, email, avatar_url };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export { getUserFromEmail, updateProfile };

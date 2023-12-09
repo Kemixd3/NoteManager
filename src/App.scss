@@ -207,7 +207,6 @@ nav {
   align-items: center;
 }
 
-
 .light-theme {
   --brand: var(--brand-light);
   --text: var(--text-black);
@@ -224,4 +223,12 @@ nav {
   --white: var(--white);
   --body: var(--body-dark);
   --menu: var(--menu-dark);
+}
+
+.logout-btn {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.3s ease-in-out;
+
+  font-size: 14px;
 }
