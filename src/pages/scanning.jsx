@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import BatchDialog from "../components/NewBatch";
 import EditDialog from "../components/editItem";
+
+import EditBatchDialog from "../components/editBatch";
+
 import { Trash3Fill, FilePlusFill, GearFill } from "react-bootstrap-icons";
 import { FormProvider, useForm } from "react-hook-form";
 import ScanForm from "../components/ScanForm";
@@ -15,7 +18,7 @@ import {
   deleteReceivingItemApi,
 } from "../Controller/RecievedGoodsController";
 
-import { fetchBatches, deleteBatch } from "../Controller/BatchesController";
+import { fetchBatches, deleteBatch, editBatchC } from "../Controller/BatchesController";
 import { fetchPurchaseOrderItems } from "../Controller/PurchaseOrderRoutes";
 
 const StockReceiving = ({ user, userData }) => {
@@ -35,9 +38,14 @@ const StockReceiving = ({ user, userData }) => {
   const [userId, setUserId] = useState(userData.userid);
   const [scannedBarcode, setScannedBarcode] = useState("");
   const [EditItem, setEditItem] = useState(null);
+  const [EditBatch, setEditBatch] = useState(null);
+
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
+  const [batchDialogOpen, setBatchDialogOpen] = useState(false);
+
+  
   const [selectedButtonIndex, setSelectedButtonIndex] = useState({
     batchDetails: null,
     purchaseOrderDetails: null,
@@ -107,15 +115,7 @@ const StockReceiving = ({ user, userData }) => {
       });
   }
 
-  const handleBatchDelete = async (batchId) => {
-    await deleteBatch(batchId)
-      .then(() => {
-        getBatches(receivedGoodsData[0].received_goods_id);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+
 
   const handleEditButtonClick = (item) => {
     setEditableItems([item]);
@@ -212,6 +212,15 @@ const StockReceiving = ({ user, userData }) => {
     });
   };
 
+  const handleEditBatch = async (item) => {
+    filteredBatches.forEach((element) => {
+      if (element.batch_id == item.batch_id) {
+        setEditBatch(item);
+        setBatchDialogOpen(true);
+      }
+    });
+  };
+
   const handleRowClick = (data) => {
     setSelectedBatch({});
     setBatchGoods([]);
@@ -236,7 +245,25 @@ const StockReceiving = ({ user, userData }) => {
     setItemDialogOpen(false);
     setEditItem(null);
   };
+  const handleBatchDelete = async (batchId) => {
+    await deleteBatch(batchId)
+      .then(() => {
+        getBatches(receivedGoodsData[0].received_goods_id);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
+  const handleCloseBatchDialog = async () => {
+    try {
+      setBatchDialogOpen(false);
+      setEditBatch(null);
+    } catch (error) {
+      console.error('Error updating batch:', error.message);
+    }
+  };
+  
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedItem(null);
@@ -260,6 +287,161 @@ const StockReceiving = ({ user, userData }) => {
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
+      
+
+      <div style={{ flex: 1, padding: "0.5%" }}>
+        <h2>Purchase Order Details</h2>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={tableHeaderStyle}>#</th>
+              <th style={tableHeaderStyle}>Name</th>
+              <th style={tableHeaderStyle}>Quantity</th>
+              <th style={tableHeaderStyle}>SI Number</th>
+              <th style={tableHeaderStyle}>Type</th>
+              <th style={tableHeaderStyle}>Select</th>
+            </tr>
+          </thead>
+          <tbody>
+            {posts.map((item, index) => (
+              <tr key={index}>
+                <td style={tableCellStyle}>{index + 1}</td>
+                <td style={tableCellStyle}>{item.Name}</td>
+                <td style={tableCellStyle}>{item.Quantity}</td>
+                <td style={tableCellStyle}>{item.SI_number}</td>
+                <td style={tableCellStyle}>{item.item_type}</td>
+                <td style={tableCellStyle}>
+                  <FilePlusFill
+                    size={40}
+                    onClick={() => {
+                      handleRowClick(item);
+                      setSelectedButtonIndex({
+                        ...selectedButtonIndex,
+                        purchaseOrderDetails: index,
+                      });
+                    }}
+                    style={{
+                      ...defaultIconStyle,
+                      color:
+                        selectedButtonIndex.purchaseOrderDetails === index
+                          ? "blue"
+                          : "",
+                    }}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {isDialogOpen && (
+          <BatchDialog
+            selectedItem={selected}
+            handleCloseDialog={handleCloseDialog}
+            recieved_goods={receivedGoodsData}
+            userData={userId}
+            items={batch}
+            selectedBatch={selectedBatch}
+          />
+        )}
+        {itemDialogOpen && (
+          <EditDialog
+            edit={EditItem}
+            handleCloseDialog={handleCloseItemDialog}
+          />
+        )}
+          {batchDialogOpen && (
+          <EditBatchDialog
+            edit={EditBatch}
+            handleCloseDialog={handleCloseBatchDialog}
+          />
+        )}
+      </div>
+
+
+
+
+      <div style={{ flex: 1, padding: "0.5%" }}>
+        <h2>Batch Details</h2>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={tableHeaderStyle}>#</th>
+              <th style={tableHeaderStyle}>Name</th>
+              <th style={tableHeaderStyle}>Made by</th>
+              <th style={tableHeaderStyle}>SI Number</th>
+              <th style={tableHeaderStyle}>Select</th>
+              <th style={tableHeaderStyle}>Edit</th>
+              <th style={tableHeaderStyle}>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredBatches.map((item, index) => (
+              <tr key={index}>
+                <td style={tableCellStyle}>{index + 1}</td>
+                <td style={tableCellStyle}>
+                  {editableItems.includes(item) ? (
+                    <input
+                      type="text"
+                      name="batch_name"
+                      value={
+                        editedValues[item.id]?.batch_name || item.batch_name
+                      }
+                      onChange={(event) => handleInputChange(event, item)}
+                    />
+                  ) : (
+                    item.batch_name
+                  )}
+                </td>
+                <td style={tableCellStyle}>{item.createdBy}</td>
+
+                <td style={tableCellStyle}>{item.si_number}</td>
+                <td style={tableCellStyle}>
+  <FilePlusFill
+    size={40}
+    className="batchDetailsButton"
+    onClick={() => {
+      handleItemSelectButtonClick(item);
+      setSelectedButtonIndex({
+        ...selectedButtonIndex,
+        batchDetails: index,
+      });
+    }}
+    style={{
+      ...defaultIconStyle,
+      color:
+        selectedButtonIndex.batchDetails === index
+          ? "blue"
+          : "inherit", // Apply color separately
+    }}
+  />
+</td>
+
+
+                <td style={tableCellStyle}>
+                    <GearFill
+                      size={33}
+                      className="batchDetailsButton"
+                      onClick={() => {
+                        handleEditBatch(item);
+                      }}
+                      style={defaultIconStyle}
+                    />
+                  </td>
+
+                <td style={tableCellStyle}>
+                  <Trash3Fill
+                    size={33}
+                    style={trashIconStyle}
+                    onClick={() => handleBatchDelete(item.batch_id)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+
       <div style={{ flex: 1, padding: "0.5%" }}>
         <h2>Stock Receiving</h2>
 
@@ -324,157 +506,7 @@ const StockReceiving = ({ user, userData }) => {
             : "Submit Batch"}
         </button>
       </div>
-
-      <div style={{ flex: 1, padding: "0.5%" }}>
-        <h2>Batch Details</h2>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={tableHeaderStyle}>#</th>
-              <th style={tableHeaderStyle}>Name</th>
-              <th style={tableHeaderStyle}>Made by</th>
-              <th style={tableHeaderStyle}>SI Number</th>
-              <th style={tableHeaderStyle}>Select</th>
-              <th style={tableHeaderStyle}>Edit</th>
-              <th style={tableHeaderStyle}>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredBatches.map((item, index) => (
-              <tr key={index}>
-                <td style={tableCellStyle}>{index + 1}</td>
-                <td style={tableCellStyle}>
-                  {editableItems.includes(item) ? (
-                    <input
-                      type="text"
-                      name="batch_name"
-                      value={
-                        editedValues[item.id]?.batch_name || item.batch_name
-                      }
-                      onChange={(event) => handleInputChange(event, item)}
-                    />
-                  ) : (
-                    item.batch_name
-                  )}
-                </td>
-                <td style={tableCellStyle}>{item.createdBy}</td>
-
-                <td style={tableCellStyle}>{item.si_number}</td>
-
-                <td style={tableCellStyle}>
-                  {editableItems.includes(item) ? (
-                    <button onClick={() => handleItemSaveButtonClick(item)}>
-                      Save
-                    </button>
-                  ) : (
-                    <FilePlusFill
-                      size={40}
-                      className="batchDetailsButton"
-                      onClick={() => {
-                        handleItemSelectButtonClick(item);
-                        setSelectedButtonIndex({
-                          ...selectedButtonIndex,
-                          batchDetails: index,
-                        });
-                      }}
-                      style={{
-                        ...defaultIconStyle,
-                        color:
-                          selectedButtonIndex.batchDetails === index
-                            ? "blue"
-                            : "inherit", // Apply color separately
-                      }}
-                    />
-                  )}
-                </td>
-                <td style={tableCellStyle}>
-                  {editableItems.includes(item) ? (
-                    <button onClick={() => handleSaveButtonClick(item)}>
-                      Save
-                    </button>
-                  ) : (
-                    <GearFill
-                      size={33}
-                      style={defaultIconStyle}
-                      onClick={() => handleEditButtonClick(item)}
-                    />
-                  )}
-                </td>
-
-                <td style={tableCellStyle}>
-                  <Trash3Fill
-                    size={33}
-                    style={trashIconStyle}
-                    onClick={() => handleBatchDelete(item.batch_id)}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div style={{ flex: 1, padding: "0.5%" }}>
-        <h2>Purchase Order Details</h2>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={tableHeaderStyle}>#</th>
-              <th style={tableHeaderStyle}>Name</th>
-              <th style={tableHeaderStyle}>Quantity</th>
-              <th style={tableHeaderStyle}>SI Number</th>
-              <th style={tableHeaderStyle}>Type</th>
-              <th style={tableHeaderStyle}>Select</th>
-            </tr>
-          </thead>
-          <tbody>
-            {posts.map((item, index) => (
-              <tr key={index}>
-                <td style={tableCellStyle}>{index + 1}</td>
-                <td style={tableCellStyle}>{item.Name}</td>
-                <td style={tableCellStyle}>{item.Quantity}</td>
-                <td style={tableCellStyle}>{item.SI_number}</td>
-                <td style={tableCellStyle}>{item.item_type}</td>
-                <td style={tableCellStyle}>
-                  <FilePlusFill
-                    size={40}
-                    onClick={() => {
-                      handleRowClick(item);
-                      setSelectedButtonIndex({
-                        ...selectedButtonIndex,
-                        purchaseOrderDetails: index,
-                      });
-                    }}
-                    style={{
-                      ...defaultIconStyle,
-                      color:
-                        selectedButtonIndex.purchaseOrderDetails === index
-                          ? "blue"
-                          : "",
-                    }}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {isDialogOpen && (
-          <BatchDialog
-            selectedItem={selected}
-            handleCloseDialog={handleCloseDialog}
-            recieved_goods={receivedGoodsData}
-            userData={userId}
-            items={batch}
-            selectedBatch={selectedBatch}
-          />
-        )}
-        {itemDialogOpen && (
-          <EditDialog
-            edit={EditItem}
-            handleCloseDialog={handleCloseItemDialog}
-          />
-        )}
-      </div>
+      
     </div>
   );
 };

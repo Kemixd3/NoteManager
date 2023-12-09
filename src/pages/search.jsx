@@ -121,16 +121,18 @@ const Search = () => {
           placeholder="Search..."
           value={searchTerm}
           onChange={handleChange}
+          style={{ borderRadius: '5px 5px 5px 5px', flex: '1' , width:'150px'}}
+
         />
 
-        <select value={selectedCategory} onChange={handleCategoryChange}>
-        <option value="po">PO</option>
-<option value="batch">Batch</option>
-<option value="receivedItems">Received Items</option>
-<option value="material">Material</option>
-<option value="poi">PO items</option>
+        <select style={{ borderRadius: '5px 5px 5px 5px', margin: '0', width:'150px',height: '48px' , marginRight:'2px', marginLeft:'2px'}} value={selectedCategory} onChange={handleCategoryChange}>
+          <option value="po">PO</option>
+          <option value="batch">Batch</option>
+          <option value="receivedItems">Received Items</option>
+          <option value="material">Material</option>
+          <option value="poi">PO items</option>
         </select>
-        <button  type="submit">Search</button>
+        <button style={{ borderRadius: '5px 5px 5px 5px', width:'150px',height: '48px' , marginRight:'2px', marginLeft:'2px'}} type="submit">Search</button>
       </form>
 
       {searchData && <SearchResultTable searchData={searchData} selectedCategory={selectedCategory} />}

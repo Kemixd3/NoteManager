@@ -32,3 +32,21 @@ export async function deleteBatch(batchId) {
     throw new Error("Failed to delete batch");
   }
 }
+
+
+export async function editBatchC(batchId,batchData) {
+  try {
+    const response = await axios.put(
+      `http://localhost:3001/batches/batches/${batchId}`,
+      batchData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  } catch (error) {
+    console.error('Error updating batch:', error.message);
+    throw new Error('Failed to update batch');
+  }
+}
