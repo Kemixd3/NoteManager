@@ -3,7 +3,7 @@ name: Build and deploy Node.js app to Azure Web App - SemesterAPI
 on:
   push:
     branches:
-      - develop
+      - release/production/1.0.0
   workflow_dispatch:
 
 jobs:
