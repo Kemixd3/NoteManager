@@ -4,12 +4,10 @@ import POOversigt from "./pages/oversigt";
 import Account from "./components/Account";
 import StockReceiving from "./pages/scanning";
 import Search from "./pages/search";
-
 import { useAuth } from "./Context/AuthContext";
 
 function Router() {
   const { user, userData } = useAuth();
-  console.log(user, userData, "ROUTER!!!!!");
   return (
     <BrowserRouter>
       <Routes>

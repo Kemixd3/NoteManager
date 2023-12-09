@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { useAuth } from "../Context/AuthContext";
 import Image from "react-bootstrap/Image";
-import { getTheme, setTheme } from "../ThemeColors";
+import { getTheme, setTheme } from "../store/ThemeColors";
 import ThemeToggle from "./ThemeToggle";
 
 function NavbarDisplay({ user, userData }) {
