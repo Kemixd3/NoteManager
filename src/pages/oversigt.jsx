@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./POOversigt.css";
+import "./POoversigt.css";
 import Table from "@mui/material/Table"; //Testing out mui table libary
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
