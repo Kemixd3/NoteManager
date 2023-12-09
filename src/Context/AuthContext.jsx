@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useGoogleLogin, googleLogout } from "@react-oauth/google";
 import axios from "axios";
+import { getUserFromEmail } from "../Controller/UserController";
 
 const AuthContext = createContext();
 
@@ -9,9 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(false);
   const [token, setToken] = useState("");
-
-  const [userStore, setUserStore] = useState(null);
-  const [userDataStore, setUserDataStore] = useState(null);
 
   const login = useGoogleLogin({
     onSuccess: (codeResponse) => {
@@ -36,6 +34,7 @@ export const AuthProvider = ({ children }) => {
     setUserData(null);
     sessionStorage.removeItem("user");
     sessionStorage.removeItem("userData");
+    sessionStorage.removeItem("token");
   };
 
   useEffect(() => {
@@ -67,21 +66,10 @@ export const AuthProvider = ({ children }) => {
         if (user && user.email) {
           setIsLoadingUser(true);
 
-          const response = await axios.get(
-            `http://localhost:3001/users/usersFromEmail/${user.email}`
-          );
+          const response = await getUserFromEmail(user.email);
 
-          if (response.data && response.data.message !== "User not found") {
-            const userDetail = response.data.user;
-            const UserData = {
-              userId: userDetail.id,
-              userName: userDetail.name,
-              userEmail: userDetail.email,
-              userImage: userDetail.image,
-              userOrg: userDetail.Organization,
-            };
-
-            setUserData(UserData);
+          if (response) {
+            setUserData(response);
           } else {
             await axios.post("http://localhost:3001/users/post", {
               userid: user.uid,

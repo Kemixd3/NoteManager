@@ -21,7 +21,7 @@ function Router() {
         />
         <Route
           path="/PO"
-          element={<POOversigt userData={userData.userOrg} />}
+          element={<POOversigt userData={userData.Organization} />}
         />
         <Route
           path="/scan/:id"

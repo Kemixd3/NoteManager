@@ -10,7 +10,7 @@ import { themes, getTheme, setTheme } from "../ThemeColors";
 function NavbarDisplay({ user, userData }) {
   const { logout } = useAuth();
   const [currentTheme, setCurrentTheme] = useState(getTheme());
-  console.log(user, "NAVBAR");
+
   useEffect(() => {
     setTheme(currentTheme);
   }, [currentTheme]);
@@ -34,7 +34,7 @@ function NavbarDisplay({ user, userData }) {
             </Nav>
 
             <Nav>
-              {user && userData && userData.userImage ? (
+              {user && userData && userData.image ? (
                 <Nav>
                   <div>
                     {" "}
@@ -47,12 +47,10 @@ function NavbarDisplay({ user, userData }) {
                     </select>
                   </div>
                   <Nav.Link style={{ color: "black" }} href="/account">
-                    <span className="me-2">
-                      Signed in as: {userData.userEmail}
-                    </span>
-                    <span className="me-5">In {userData.userOrg} </span>
+                    <span className="me-2">Signed in as: {userData.email}</span>
+                    <span className="me-5">In {userData.Organization} </span>
                     <Image
-                      src={userData.userImage}
+                      src={userData.image}
                       alt="User Avatar"
                       roundedCircle
                       width="30"
@@ -63,7 +61,7 @@ function NavbarDisplay({ user, userData }) {
                   <button onClick={logout}>Log out</button>
                 </Nav>
               ) : (
-                //Your fallback UI when user data is gone
+                //fallback UI when user data is gone
                 <Nav.Link style={{ color: "black" }} href="#login">
                   Sign In
                 </Nav.Link>
