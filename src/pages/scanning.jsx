@@ -23,7 +23,6 @@ import { fetchBatches, deleteBatch } from "../Controller/BatchesController";
 import { fetchPurchaseOrderItems } from "../Controller/PurchaseOrderRoutes";
 
 const StockReceiving = ({ user, userData }) => {
-  console.log("SCANNING PAGE", user, userData);
   const [selected, setSelected] = useState([]);
   const [batches, setAllBatches] = useState([]);
   const [editableItems, setEditableItems] = useState([]);
@@ -34,13 +33,12 @@ const StockReceiving = ({ user, userData }) => {
   const [selectedBatch, setSelectedBatch] = useState({});
   const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
-
   const { id } = useParams(); //Get PO ID from the route
   const [userId, setUserId] = useState(userData.userid);
   const [scannedBarcode, setScannedBarcode] = useState("");
   const [EditItem, setEditItem] = useState(null);
   const [EditBatch, setEditBatch] = useState(null);
-
+  const [Reseived_goods_id, setReceivedGoodsId] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
@@ -65,12 +63,12 @@ const StockReceiving = ({ user, userData }) => {
 
       if (!receivedData.message) {
         setReceivedGoods(receivedData.receivedGoods);
-        getBatches(receivedData.receivedGoods[0].received_goods_id);
+        setReceivedGoodsId(receivedData.receivedGoods[0].received_goods_id);
         setPosts(postsData.purchaseOrderItems);
       } else {
         const success = await postReceivedGoods(id, userData.userOrg);
         if (success) {
-          console.log("RELOAD");
+          //Rerun the useffect
           ReloadOrders([]);
         }
       }
@@ -93,15 +91,12 @@ const StockReceiving = ({ user, userData }) => {
     };
   }, [scannedBarcode]);
 
-  async function getBatches(received_goods_id) {
-    fetchBatches(received_goods_id)
+  async function getBatches(received_goods_id, si_number) {
+    fetchBatches(received_goods_id, si_number)
       .then((data) => {
         setAllBatches(data);
-
-        if (Object.keys(selected).length !== 0) {
-          setFilteredBatches(
-            data.filter((element) => element.si_number === selected.SI_number)
-          );
+        if (data) {
+          setFilteredBatches(data);
         }
       })
       .catch((error) => {
@@ -184,7 +179,6 @@ const StockReceiving = ({ user, userData }) => {
   const handleEditItem = async (item) => {
     posts.forEach((element) => {
       if (element.SI_number == item.SI_number) {
-        console.log(item, element);
         item.QuantityPO = element.Quantity;
         setEditItem(item);
         setItemDialogOpen(true);
@@ -202,6 +196,8 @@ const StockReceiving = ({ user, userData }) => {
   };
 
   const handleRowClick = (data) => {
+    getBatches(Reseived_goods_id, data.SI_number);
+
     setSelectedBatch({});
     setBatchGoods([]);
     setFilteredBatches(
@@ -228,7 +224,7 @@ const StockReceiving = ({ user, userData }) => {
   const handleBatchDelete = async (batchId) => {
     await deleteBatch(batchId)
       .then(() => {
-        getBatches(receivedGoodsData[0].received_goods_id);
+        getBatches(receivedGoodsData[0].received_goods_id, selected.SI_number);
       })
       .catch((error) => {
         console.error(error);
@@ -247,7 +243,7 @@ const StockReceiving = ({ user, userData }) => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedItem(null);
-    getBatches(receivedGoodsData[0].received_goods_id);
+    getBatches(receivedGoodsData[0].received_goods_id, selected.SI_number);
   };
 
   async function deleteReceivingItem(line) {
