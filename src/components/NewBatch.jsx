@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./NewBatch.css";
 import { current } from "@reduxjs/toolkit";
+import { submitReceivedGoods } from "../Controller/RecievedGoodsController";
 
 export default function BatchDialog({
   selectedItem,
@@ -18,11 +19,8 @@ export default function BatchDialog({
     //populate form
     if (selectedItem) {
       setFormData(selectedItem);
-      console.log(formData, "formdatassss");
     }
     if (recieved_goods) {
-      console.log(recieved_goods, "CMONS2");
-
       setRecievedGoods(recieved_goods[0]);
     }
   }, [selectedItem]);
@@ -30,65 +28,20 @@ export default function BatchDialog({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (items && items.length > 0) {
-      const filteredItems = items.filter((item) => !item.received_item_id);
-      console.log(filteredItems, "THEONE");
-      const requestBody = {
-        batch_id: selectedBatch.batch_id,
-        receivedGoodsItems: filteredItems,
-      };
-
-      try {
-        const response = await fetch(
-          "http://localhost:3001/receiving/received_goods_items",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestBody),
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Received goods items added:", data.message);
-          handleCloseDialog();
-          // Perform any additional actions after successful addition of items
-        } else {
-          console.error("Failed to add received goods items:", response.status);
-          // Handle the error scenario
-        }
-      } catch (error) {
-        console.error("Error adding received goods items:", error);
-        // Handle the error scenario
-      }
-    } else {
-      const currentDate = new Date().toISOString().split("T")[0];
-
-      const batchData = {
-        received_date: currentDate, // Consider formatting the date as required by your backend
-        batch_name: formData.Name,
-        si_number: formData.SI_number, // Ensure the correct case for keys
-        createdBy: userData,
-        received_goods_received_goods_id: recievedGoodsData.received_goods_id,
-      };
-
-      const response = await fetch("http://localhost:3001/batches", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(batchData),
+    await submitReceivedGoods(
+      items,
+      selectedBatch,
+      userData,
+      formData,
+      recievedGoodsData
+    )
+      .then((data) => {
+        console.log(data, "Submitted");
+        handleCloseDialog();
+      })
+      .catch((error) => {
+        console.error(error);
       });
-      const data = await response.json();
-      console.log("Batch created successfully:", data);
-      handleCloseDialog();
-
-      if (!response.ok) {
-        throw new Error("Error creating batch");
-      }
-    }
   };
 
   const validateQuantityChange = (e) => {

@@ -1,33 +1,30 @@
 import { useState, useEffect } from "react";
 import "dhtmlx-gantt";
-
+import { getPosts } from "../Controller/PurchaseOrderRoutes";
 import "dhtmlx-gantt/codebase/skins/dhtmlxgantt_contrast_white.css";
-
+import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
-import { style } from "@mui/system";
 import "./home.css";
 
-export default function HomePage({ user, userData }) {
+export default function HomePage({ userData }) {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate
+  const { user } = useAuth();
   document.title = 'Home';
 
   useEffect(() => {
-    async function getPosts() {
-      try {
-        const response = await fetch(
-          "http://localhost:3001/orders/purchase-orders?org=" + userData.userOrg
-        );
-        const data = await response.json();
-        console.log("a", data);
-        setPosts(data);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
+    if (userData && userData.Organization) {
+      const fetchData = async () => {
+        try {
+          const data = await getPosts(userData.Organization);
+          setPosts(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchData();
     }
-
-    getPosts();
-  }, []);
+  }, [userData, user]);
 
   useEffect(() => {
     gantt.init("gantt-container");

@@ -8,6 +8,16 @@ import ScanForm from "../components/ScanForm";
 import axios from "axios";
 import "./scanning.css";
 
+import {
+  fetchReceivedGoods,
+  postReceivedGoods,
+  fetchReceivedGoodsItemsApi,
+  deleteReceivingItemApi,
+} from "../Controller/RecievedGoodsController";
+
+import { fetchBatches, deleteBatch } from "../Controller/BatchesController";
+import { fetchPurchaseOrderItems } from "../Controller/PurchaseOrderRoutes";
+
 const StockReceiving = ({ user, userData }) => {
   console.log("SCANNING PAGE", user, userData);
   const [selected, setSelected] = useState([]);
@@ -22,7 +32,7 @@ const StockReceiving = ({ user, userData }) => {
   const [reload, ReloadOrders] = useState([]);
   const [EditableItemsInBatch, setEditableItemsInBatch] = useState([]);
   const { id } = useParams(); //Get PO ID from the route
-  const [userId, setUserId] = useState(user.id);
+  const [userId, setUserId] = useState(userData.userid);
   const [scannedBarcode, setScannedBarcode] = useState("");
   const [EditItem, setEditItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -38,49 +48,25 @@ const StockReceiving = ({ user, userData }) => {
   useEffect(() => {
     const fetchData = async () => {
       const [postsResponse, receivedGoods] = await Promise.all([
-        fetch(`http://localhost:3001/orders/purchase-order-items/${id}`),
-
-        fetch(
-          `http://localhost:3001/receiving/received-goods/${id}/${userData.userOrg}`
-        ),
+        fetchPurchaseOrderItems(id),
+        fetchReceivedGoods(id, userData.Organization),
       ]);
 
-      const postsData = await postsResponse.json();
-
-      const receivedData = await receivedGoods.json();
+      const postsData = postsResponse;
+      const receivedData = receivedGoods;
 
       if (!receivedData.message) {
-        console.log("receivedData", receivedData);
         setReceivedGoods(receivedData.receivedGoods);
-
         getBatches(receivedData.receivedGoods[0].received_goods_id);
-
         setPosts(postsData.purchaseOrderItems);
       } else {
-        const currentDate = new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ");
-
-        fetch("http://localhost:3001/receiving/received-goods", {
-          method: "POST",
-          body: JSON.stringify({
-            received_date: currentDate,
-            purchase_order_id: id,
-            Organization: userData.userOrg,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-        }).then((response) => {
-          if (response.status === 201) {
-            console.log("RELOAD");
-            ReloadOrders([]);
-          }
-        });
+        const success = await postReceivedGoods(id, userData.userOrg);
+        if (success) {
+          console.log("RELOAD");
+          ReloadOrders([]);
+        }
       }
     };
-
     fetchData();
   }, [id, reload]);
 
@@ -93,49 +79,42 @@ const StockReceiving = ({ user, userData }) => {
         setScannedBarcode("");
       }
     };
-
     window.addEventListener("keydown", handleBarcodeScan);
-
     return () => {
       window.removeEventListener("keydown", handleBarcodeScan);
     };
   }, [scannedBarcode]);
 
   const handleSaveButtonClick = (item) => {
-    console.log("Saving edited values:", editedValues[item.id]);
-
     setEditableItems((prevEditableItems) =>
       prevEditableItems.filter((editableItem) => editableItem !== item)
     );
   };
 
   async function getBatches(received_goods_id) {
-    await axios
-      .get(`http://localhost:3001/batches/${received_goods_id}`)
-      .then((response) => {
-        console.log(response.data);
-        setAllBatches(response.data);
+    fetchBatches(received_goods_id)
+      .then((data) => {
+        setAllBatches(data);
 
         if (Object.keys(selected).length !== 0) {
           setFilteredBatches(
-            response.data.filter(
-              (element) => element.si_number === selected.SI_number
-            )
+            data.filter((element) => element.si_number === selected.SI_number)
           );
         }
       })
       .catch((error) => {
-        console.error("Error fetching batches:", error);
+        console.error(error);
       });
   }
 
   const handleBatchDelete = async (batchId) => {
-    try {
-      await axios.delete(`http://localhost:3001/batches/batches/${batchId}`);
-      getBatches(receivedGoodsData[0].received_goods_id);
-    } catch (error) {
-      console.error("Error deleting batch:", error.message);
-    }
+    await deleteBatch(batchId)
+      .then(() => {
+        getBatches(receivedGoodsData[0].received_goods_id);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleEditButtonClick = (item) => {
@@ -151,14 +130,14 @@ const StockReceiving = ({ user, userData }) => {
   };
 
   const fetchReceivedGoodsItems = async (batchId, siNumber) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:3001/receiving/received_goods_items/${batchId}/${siNumber}`
-      );
-      setBatchGoods(response.data.receivedGoodsItems);
-    } catch (error) {
-      console.error("Error fetching received goods items:", error.message);
-    }
+    await fetchReceivedGoodsItemsApi(batchId, siNumber)
+      .then((receivedGoodsItems) => {
+        //received goods items data
+        setBatchGoods(receivedGoodsItems);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleItemSelectButtonClick = async (item) => {
@@ -166,7 +145,7 @@ const StockReceiving = ({ user, userData }) => {
       ".batchDetailsButton"
     );
 
-    // Remove the class with grey color of all buttons with the class .batchDetailsButton
+    //Remove class with grey color of all buttons with the class .batchDetailsButton
     batchDetailsButtons.forEach((button) => {
       button.classList.remove("defaultButtonStyle");
     });
@@ -177,7 +156,7 @@ const StockReceiving = ({ user, userData }) => {
     try {
       await fetchReceivedGoodsItems(item.batch_id, item.si_number);
     } catch (error) {
-      // Handle error if needed
+      console.log("Error getting Goods");
     }
   };
 
@@ -265,23 +244,18 @@ const StockReceiving = ({ user, userData }) => {
   };
 
   async function deleteReceivingItem(line) {
-    try {
-      const response = await axios.delete(
-        `http://localhost:3001/receiving/received_goods_items/${line}`
-      );
-
-      if (response.status === 200) {
-        console.log("Received goods item deleted successfully");
-        await fetchReceivedGoodsItems(
-          selectedBatch.batch_id,
-          selectedBatch.si_number
-        );
-      } else {
-        throw new Error("Failed to delete received goods item");
-      }
-    } catch (error) {
-      console.error("Error deleting received goods item:", error.message);
-    }
+    await deleteReceivingItemApi(line)
+      .then((isDeleted) => {
+        if (isDeleted) {
+          fetchReceivedGoodsItems(
+            selectedBatch.batch_id,
+            selectedBatch.si_number
+          );
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   return (

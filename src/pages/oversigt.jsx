@@ -9,30 +9,24 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
+import { getPosts } from "../Controller/PurchaseOrderRoutes";
 
 const POOversigt = (userData) => {
   const [purchaseOrders, setpurchaseOrders] = useState([]);
   document.title = 'PO Overview';
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        //mangler at connect til API
-
-        const getOrders = await fetch(
-          "http://localhost:3001/orders/purchase-orders?org=" +
-            userData.userData
-        );
-        const response = await getOrders.json();
-        setpurchaseOrders(response);
-        console.log(purchaseOrders);
-        console.log(response);
-      } catch (error) {
-        console.error("Error fetching purchase orders:", error);
-      }
-    };
-
-    fetchData();
+    if (userData.userData) {
+      const fetchData = async () => {
+        try {
+          const data = await getPosts(userData.userData);
+          setpurchaseOrders(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchData();
+    }
   }, []);
 
   const handleOrderClick = (orderId) => {
