@@ -2,7 +2,7 @@ import axios from "axios";
 
 const token = sessionStorage.getItem("token");
 
-export async function fetchBatches(receivedGoodsId) {
+async function fetchBatches(receivedGoodsId) {
   try {
     const response = await axios.get(
       `http://localhost:3001/batches/${receivedGoodsId}`,
@@ -20,7 +20,7 @@ export async function fetchBatches(receivedGoodsId) {
   }
 }
 
-export async function deleteBatch(batchId) {
+async function deleteBatch(batchId) {
   try {
     await axios.delete(`http://localhost:3001/batches/batches/${batchId}`, {
       headers: {
@@ -33,10 +33,9 @@ export async function deleteBatch(batchId) {
   }
 }
 
-
-export async function editBatchC(batchId,batchData) {
+async function UpdateBatch(batchId, batchData) {
   try {
-    const response = await axios.put(
+    await axios.put(
       `http://localhost:3001/batches/batches/${batchId}`,
       batchData,
       {
@@ -46,7 +45,9 @@ export async function editBatchC(batchId,batchData) {
       }
     );
   } catch (error) {
-    console.error('Error updating batch:', error.message);
-    throw new Error('Failed to update batch');
+    console.error("Error updating batch:", error.message);
+    throw new Error("Failed to update batch");
   }
 }
+
+export { fetchBatches, deleteBatch, UpdateBatch };

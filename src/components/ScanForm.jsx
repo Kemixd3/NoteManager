@@ -1,6 +1,9 @@
 import { useFormContext } from "react-hook-form";
+import { useEffect, useRef } from "react";
 
 const ScanForm = ({ addLine }) => {
+  const barcodeRef = useRef(null);
+
   //Getting context from react-hook-form
   const {
     register,
@@ -8,6 +11,12 @@ const ScanForm = ({ addLine }) => {
     formState: { errors },
     reset,
   } = useFormContext();
+
+  useEffect(() => {
+    if (barcodeRef.current) {
+      barcodeRef.current.focus();
+    }
+  }, [addLine]);
 
   const onSubmit = (data) => {
     console.log(data);
@@ -48,6 +57,7 @@ const ScanForm = ({ addLine }) => {
           {...register("scannedBarcode", { required: true })}
           placeholder="Scan here"
           onKeyDown={handleBarcodeScan}
+          ref={barcodeRef}
           autoFocus
         />
         {errors.scannedBarcode && <span>Scanned barcode is required.</span>}

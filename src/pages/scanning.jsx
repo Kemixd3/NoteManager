@@ -2,23 +2,24 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import BatchDialog from "../components/NewBatch";
 import EditDialog from "../components/editItem";
-
+import {
+  trashIconStyle,
+  defaultIconStyle,
+  tableHeaderStyle,
+  tableCellStyle,
+} from "../store/cssStore";
 import EditBatchDialog from "../components/editBatch";
-
 import { Trash3Fill, FilePlusFill, GearFill } from "react-bootstrap-icons";
 import { FormProvider, useForm } from "react-hook-form";
 import ScanForm from "../components/ScanForm";
-import axios from "axios";
 import "./scanning.css";
-
 import {
   fetchReceivedGoods,
   postReceivedGoods,
   fetchReceivedGoodsItemsApi,
   deleteReceivingItemApi,
 } from "../Controller/RecievedGoodsController";
-
-import { fetchBatches, deleteBatch, editBatchC } from "../Controller/BatchesController";
+import { fetchBatches, deleteBatch } from "../Controller/BatchesController";
 import { fetchPurchaseOrderItems } from "../Controller/PurchaseOrderRoutes";
 
 const StockReceiving = ({ user, userData }) => {
@@ -33,7 +34,7 @@ const StockReceiving = ({ user, userData }) => {
   const [selectedBatch, setSelectedBatch] = useState({});
   const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
-  const [EditableItemsInBatch, setEditableItemsInBatch] = useState([]);
+
   const { id } = useParams(); //Get PO ID from the route
   const [userId, setUserId] = useState(userData.userid);
   const [scannedBarcode, setScannedBarcode] = useState("");
@@ -45,13 +46,12 @@ const StockReceiving = ({ user, userData }) => {
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
   const [batchDialogOpen, setBatchDialogOpen] = useState(false);
 
-  
   const [selectedButtonIndex, setSelectedButtonIndex] = useState({
     batchDetails: null,
     purchaseOrderDetails: null,
   });
   const methods = useForm();
-  document.title = 'Scanning';
+  document.title = "Scanning";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,12 +93,6 @@ const StockReceiving = ({ user, userData }) => {
     };
   }, [scannedBarcode]);
 
-  const handleSaveButtonClick = (item) => {
-    setEditableItems((prevEditableItems) =>
-      prevEditableItems.filter((editableItem) => editableItem !== item)
-    );
-  };
-
   async function getBatches(received_goods_id) {
     fetchBatches(received_goods_id)
       .then((data) => {
@@ -114,20 +108,6 @@ const StockReceiving = ({ user, userData }) => {
         console.error(error);
       });
   }
-
-
-
-  const handleEditButtonClick = (item) => {
-    setEditableItems([item]);
-  };
-
-  const handleItemSaveButtonClick = (item) => {
-    setEditableItemsInBatch((SelectedBatchItems) =>
-      SelectedBatchItems.filter(
-        (EditableItemsInBatch) => EditableItemsInBatch !== item
-      )
-    );
-  };
 
   const fetchReceivedGoodsItems = async (batchId, siNumber) => {
     await fetchReceivedGoodsItemsApi(batchId, siNumber)
@@ -260,10 +240,10 @@ const StockReceiving = ({ user, userData }) => {
       setBatchDialogOpen(false);
       setEditBatch(null);
     } catch (error) {
-      console.error('Error updating batch:', error.message);
+      console.error("Error updating batch:", error.message);
     }
   };
-  
+
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedItem(null);
@@ -287,8 +267,6 @@ const StockReceiving = ({ user, userData }) => {
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between" }}>
-      
-
       <div style={{ flex: 1, padding: "0.5%" }}>
         <h2>Purchase Order Details</h2>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -349,16 +327,13 @@ const StockReceiving = ({ user, userData }) => {
             handleCloseDialog={handleCloseItemDialog}
           />
         )}
-          {batchDialogOpen && (
+        {batchDialogOpen && (
           <EditBatchDialog
             edit={EditBatch}
             handleCloseDialog={handleCloseBatchDialog}
           />
         )}
       </div>
-
-
-
 
       <div style={{ flex: 1, padding: "0.5%" }}>
         <h2>Batch Details</h2>
@@ -396,37 +371,36 @@ const StockReceiving = ({ user, userData }) => {
 
                 <td style={tableCellStyle}>{item.si_number}</td>
                 <td style={tableCellStyle}>
-  <FilePlusFill
-    size={40}
-    className="batchDetailsButton"
-    onClick={() => {
-      handleItemSelectButtonClick(item);
-      setSelectedButtonIndex({
-        ...selectedButtonIndex,
-        batchDetails: index,
-      });
-    }}
-    style={{
-      ...defaultIconStyle,
-      color:
-        selectedButtonIndex.batchDetails === index
-          ? "blue"
-          : "inherit", // Apply color separately
-    }}
-  />
-</td>
-
+                  <FilePlusFill
+                    size={40}
+                    className="batchDetailsButton"
+                    onClick={() => {
+                      handleItemSelectButtonClick(item);
+                      setSelectedButtonIndex({
+                        ...selectedButtonIndex,
+                        batchDetails: index,
+                      });
+                    }}
+                    style={{
+                      ...defaultIconStyle,
+                      color:
+                        selectedButtonIndex.batchDetails === index
+                          ? "blue"
+                          : "inherit", // Apply color separately
+                    }}
+                  />
+                </td>
 
                 <td style={tableCellStyle}>
-                    <GearFill
-                      size={33}
-                      className="batchDetailsButton"
-                      onClick={() => {
-                        handleEditBatch(item);
-                      }}
-                      style={defaultIconStyle}
-                    />
-                  </td>
+                  <GearFill
+                    size={33}
+                    className="batchDetailsButton"
+                    onClick={() => {
+                      handleEditBatch(item);
+                    }}
+                    style={defaultIconStyle}
+                  />
+                </td>
 
                 <td style={tableCellStyle}>
                   <Trash3Fill
@@ -440,7 +414,6 @@ const StockReceiving = ({ user, userData }) => {
           </tbody>
         </table>
       </div>
-
 
       <div style={{ flex: 1, padding: "0.5%" }}>
         <h2>Stock Receiving</h2>
@@ -506,34 +479,8 @@ const StockReceiving = ({ user, userData }) => {
             : "Submit Batch"}
         </button>
       </div>
-      
     </div>
   );
-};
-
-//CUSTOM STYLING
-
-const trashIconStyle = {
-  cursor: "pointer",
-  color: "red",
-  transition: "color 0.3s ease", //transition
-};
-
-const defaultIconStyle = {
-  cursor: "pointer",
-
-  transition: "color 0.3s ease",
-};
-
-const tableHeaderStyle = {
-  border: "1px solid #ddd",
-  padding: "8px",
-  backgroundColor: "#f2f2f2",
-};
-
-const tableCellStyle = {
-  border: "1px solid #ddd",
-  padding: "8px",
 };
 
 export default StockReceiving;

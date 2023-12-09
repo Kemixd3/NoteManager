@@ -1,12 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./NewBatch.css";
-import { current } from "@reduxjs/toolkit";
-import { editBatchC } from "../Controller/BatchesController";
+import { UpdateBatch } from "../Controller/BatchesController";
 
-export default function EditBatchDialog({
-  edit,
-  handleCloseDialog,
-}) {
+export default function EditBatchDialog({ edit, handleCloseDialog }) {
   console.log(edit);
   const [formData, setFormData] = useState({
     BatchName: edit.batch_name,
@@ -18,7 +14,7 @@ export default function EditBatchDialog({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await editBatchC(edit.batch_id,formData);
+    await UpdateBatch(edit.batch_id, formData);
     handleCloseDialog();
   };
 
