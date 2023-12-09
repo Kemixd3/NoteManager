@@ -1,6 +1,6 @@
 const token = sessionStorage.getItem("token");
 import axios from "axios";
-const baseUrl = "http://localhost:3001";
+const baseUrl = "https://semesterapi.azurewebsites.net";
 async function getPosts(org) {
   try {
     if (token && token !== "Bearer null") {

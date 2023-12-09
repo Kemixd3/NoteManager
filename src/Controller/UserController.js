@@ -1,6 +1,6 @@
 import axios from "axios";
 const SecretToken = sessionStorage.getItem("token");
-const baseUrl = "http://localhost:3001";
+const baseUrl = "https://semesterapi.azurewebsites.net";
 
 async function getUserFromEmail(email) {
   try {
