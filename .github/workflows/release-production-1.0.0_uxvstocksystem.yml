@@ -1,12 +1,9 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - UXVStockSystem
+name: Build and deploy Node.js app to Azure Web App - SemesterAPI
 
 on:
   push:
     branches:
-      - release/production/1.0.0
+      - develop
   workflow_dispatch:
 
 jobs:
@@ -28,7 +25,7 @@ jobs:
           npm run test --if-present
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: zip -r release.zip ./dist/*
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -49,15 +46,11 @@ jobs:
         with:
           name: node-app
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
       - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          path: "./dist"
-          app-name: "UXVStockSystem"
+          app-name: "SemesterAPI"
           slot-name: "Production"
-          package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E126D7E0FAC9455F9D64FBF8190E4920 }}
+          package: ${{ github.workspace }}/release.zip
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2C1305D798CF4CDB8D43AD8F3BA76DE8 }}
