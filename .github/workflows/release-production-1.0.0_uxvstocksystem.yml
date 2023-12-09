@@ -1,4 +1,4 @@
-name: Build and deploy Node.js app to Azure Web App - SemesterAPI
+name: Build and deploy Node.js app to Azure Web App - UXVStockSystem
 
 on:
   push:
@@ -50,7 +50,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "SemesterAPI"
+          app-name: "UXVStockSystem"
           slot-name: "Production"
           package: ${{ github.workspace }}/release.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E126D7E0FAC9455F9D64FBF8190E4920 }}
