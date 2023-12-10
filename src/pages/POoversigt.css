@@ -60,3 +60,15 @@ li:hover {
   border-bottom-style: solid;
   border-bottom-color: #b0b3b8 !important;
 }
+
+.darkmode .MuiPaper-root {
+  background-color: #18191a !important;
+}
+
+.darkmode .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
+  background-color: #18191a !important;
+}
+
+.darkmode .css-13xy2my {
+  background-color: #18191a !important;
+}
