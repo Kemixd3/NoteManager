@@ -43,7 +43,7 @@ const StockReceiving = ({ user, userData }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
   const [batchDialogOpen, setBatchDialogOpen] = useState(false);
-
+  const [filePlusFillColors, setFilePlusFillColors] = useState({});
   const [selectedButtonIndex, setSelectedButtonIndex] = useState({
     batchDetails: null,
     purchaseOrderDetails: null,
@@ -168,7 +168,7 @@ const StockReceiving = ({ user, userData }) => {
 
   //Function to select batch before batchDialog
   const handleSubmit = () => {
-    if (selected.item_type == "Tablet") {
+    if (["Tablet", "Part", "Component"].includes(selected.item_type)) {
       setSelectedItem(selected);
       setIsDialogOpen(true);
     } else {
@@ -195,8 +195,16 @@ const StockReceiving = ({ user, userData }) => {
     });
   };
 
-  const handleRowClick = (data) => {
-    getBatches(Reseived_goods_id, data.SI_number);
+  const handleRowClick = async (data, index) => {
+    const updatedColors = {};
+    for (let i = 0; i < posts.length; i++) {
+      updatedColors[i] = "";
+    }
+    updatedColors[index] =
+      selectedButtonIndex.purchaseOrderDetails !== index ? "blue" : "";
+
+    setFilePlusFillColors({ ...updatedColors });
+    await getBatches(Reseived_goods_id, data.SI_number);
 
     setSelectedBatch({});
     setBatchGoods([]);
@@ -288,18 +296,15 @@ const StockReceiving = ({ user, userData }) => {
                   <FilePlusFill
                     size={40}
                     onClick={() => {
-                      handleRowClick(item);
                       setSelectedButtonIndex({
                         ...selectedButtonIndex,
                         purchaseOrderDetails: index,
                       });
+                      handleRowClick(item, index);
                     }}
                     style={{
                       ...defaultIconStyle,
-                      color:
-                        selectedButtonIndex.purchaseOrderDetails === index
-                          ? "blue"
-                          : "",
+                      color: filePlusFillColors[index],
                     }}
                   />
                 </td>
@@ -390,7 +395,6 @@ const StockReceiving = ({ user, userData }) => {
                 <td style={tableCellStyle}>
                   <GearFill
                     size={33}
-                    className="batchDetailsButton"
                     onClick={() => {
                       handleEditBatch(item);
                     }}
@@ -444,7 +448,6 @@ const StockReceiving = ({ user, userData }) => {
                   <td style={tableCellStyle}>
                     <GearFill
                       size={33}
-                      className="batchDetailsButton"
                       onClick={() => {
                         handleEditItem(item);
                       }}
