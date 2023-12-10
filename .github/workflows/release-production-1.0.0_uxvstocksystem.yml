@@ -3,7 +3,7 @@ name: Build and deploy Node.js app to Azure Web App - UXVStockSystem
 on:
   push:
     branches:
-      - release/production/1.0.0
+      - release/production/*
   workflow_dispatch:
 
 jobs:
