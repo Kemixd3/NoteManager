@@ -42,8 +42,8 @@ export default function EditDialog({ edit, handleCloseDialog }) {
       <dialog className="dialog" open>
         <form onSubmit={handleSubmit}>
           <h4>Editing received goods item {formData.received_item_id}</h4>
+          <label htmlFor="barcode">Barcode</label>
           <div>
-            <label htmlFor="barcode">Barcode</label>
             <input
               id="barcode"
               type="text"
@@ -53,8 +53,8 @@ export default function EditDialog({ edit, handleCloseDialog }) {
               }
             />
           </div>
+          <label htmlFor="quantity">Quantity</label>
           <div>
-            <label htmlFor="quantity">Quantity</label>
             <input
               id="quantity"
               type="text"
@@ -62,9 +62,13 @@ export default function EditDialog({ edit, handleCloseDialog }) {
               onChange={(e) => validateQuantityChange(e)}
             />
           </div>
-          <button type="submit">Save</button>
+          <button className="me-5" type="submit">
+            Save
+          </button>
+          <button type="button" onClick={handleCloseDialog}>
+            Close
+          </button>
         </form>
-        <button onClick={handleCloseDialog}>Close</button>
       </dialog>
     </div>
   );
