@@ -3,7 +3,6 @@ import "./NewBatch.css";
 import { UpdateBatch } from "../Controller/BatchesController";
 
 export default function EditBatchDialog({ edit, handleCloseDialog }) {
-  console.log(edit);
   const [formData, setFormData] = useState({
     BatchName: edit.batch_name,
     CreatedBy: edit.createdBy,
@@ -23,8 +22,8 @@ export default function EditBatchDialog({ edit, handleCloseDialog }) {
       <dialog className="dialog" open>
         <form onSubmit={handleSubmit}>
           <h4>Editing batch {edit.batch_id}</h4>
+          <label htmlFor="batchName">Batch Name</label>
           <div>
-            <label htmlFor="batchName">Batch Name</label>
             <input
               id="batchName"
               type="text"
@@ -34,19 +33,9 @@ export default function EditBatchDialog({ edit, handleCloseDialog }) {
               }
             />
           </div>
+
+          <label htmlFor="receivedGoodsID">Received Goods ID</label>
           <div>
-            <label htmlFor="createdBy">Created By</label>
-            <input
-              id="createdBy"
-              type="text"
-              value={formData.CreatedBy || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, CreatedBy: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <label htmlFor="receivedGoodsID">Received Goods ID</label>
             <input
               id="receivedGoodsID"
               type="text"
@@ -56,19 +45,9 @@ export default function EditBatchDialog({ edit, handleCloseDialog }) {
               }
             />
           </div>
+
+          <label htmlFor="siNumber">SI Number</label>
           <div>
-            <label htmlFor="siDate">SI Date</label>
-            <input
-              id="siDate"
-              type="text"
-              value={formData.SIDate || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, SIDate: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <label htmlFor="siNumber">SI Number</label>
             <input
               id="siNumber"
               type="text"
@@ -78,9 +57,13 @@ export default function EditBatchDialog({ edit, handleCloseDialog }) {
               }
             />
           </div>
-          <button type="submit">Save</button>
+          <button className="me-5" type="submit">
+            Save
+          </button>
+          <button type="button" onClick={handleCloseDialog}>
+            Close
+          </button>
         </form>
-        <button onClick={handleCloseDialog}>Close</button>
       </dialog>
     </div>
   );

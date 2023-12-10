@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import "./NewBatch.css";
-import { current } from "@reduxjs/toolkit";
 import { submitReceivedGoods } from "../Controller/RecievedGoodsController";
 
 export default function BatchDialog({
@@ -70,41 +69,54 @@ export default function BatchDialog({
                 <p>SI Number: {element.SI_number}</p>
                 <p>Barcode: {element.Name}</p>
                 <p>Quantity: {element.Quantity}</p>
-                {/* Add more details if needed */}
+
                 <hr />
               </div>
             ))}
-            <button onClick={handleSubmit}>Save</button>
+            <button type="submit" className="me-5" onClick={handleSubmit}>
+              Save
+            </button>
+            <button type="button" onClick={handleCloseDialog}>
+              Close
+            </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            {/* here render form fields to edit data */}
             <h4>
               Creating a batch for Material {formData.item_type}{" "}
               {formData.SI_number}
             </h4>
-            <input
-              label="Batch Name"
-              type="text"
-              value={formData.Name || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, Name: e.target.value })
-              }
-            />
+            <label htmlFor="Batch Name">Batch Name</label>
+            <div>
+              {" "}
+              <input
+                label="Batch Name"
+                type="text"
+                value={formData.Name || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, Name: e.target.value })
+                }
+              />
+            </div>
+            <label htmlFor="Quantity of batch">Quantity of batch</label>
+            <div>
+              {" "}
+              <input
+                label="Quantity of batch"
+                type="text"
+                value={formData.Quantity || ""}
+                onChange={(e) => validateQuantityChange(e)}
+              />
+            </div>
 
-            <input
-              label="Quantity of batch"
-              type="text"
-              value={formData.Quantity || ""}
-              onChange={(e) => validateQuantityChange(e)}
-            />
-            <button type="submit">Save</button>
+            <button className="me-5" type="submit">
+              Save
+            </button>
+            <button type="button" onClick={handleCloseDialog}>
+              Close
+            </button>
           </form>
         )}
-
-        {/* Submit here */}
-
-        <button onClick={handleCloseDialog}>Close</button>
       </dialog>
     </div>
   );
