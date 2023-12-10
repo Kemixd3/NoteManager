@@ -36,7 +36,7 @@ li:hover {
 }
 
 .darkmode .css-177gid-MuiTableCell-root {
-  color: #f0f0f0 !important;
+  color: #b0b3b8 !important;
 }
 
 .darkmode h2 {
@@ -82,5 +82,13 @@ li:hover {
   color: #b0b3b8 !important;
 }
 .darkmode .MuiTableCell-root .MuiTableCell-body {
+  color: #b0b3b8 !important;
+}
+
+.darkmode .css-1i36psw {
+  color: #b0b3b8 !important;
+}
+
+.darkmode td {
   color: #b0b3b8 !important;
 }
