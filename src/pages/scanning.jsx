@@ -172,7 +172,7 @@ const StockReceiving = ({ user, userData }) => {
       setSelectedItem(selected);
       setIsDialogOpen(true);
     } else {
-      console.log("component or tablet");
+      console.log("component, tablet or part types only");
     }
   };
 
@@ -217,8 +217,9 @@ const StockReceiving = ({ user, userData }) => {
       ".batchDetailsButton"
     );
 
-    batchDetailsButtons.forEach((button) => {
-      button.classList.add("defaultButtonStyle"); //Reset the background color of all buttons with the class .batchDetailsButton to the default grey
+    batchDetailsButtons.forEach((svg) => {
+      svg.classList.add("defaultButtonStyle"); //Reset the background color of all buttons with the class .batchDetailsButton to the default grey
+      svg.classList.remove("batchDetailsButtons");
     });
 
     setSelectedButtonIndex({ ...selectedButtonIndex, batchDetails: null });
@@ -387,7 +388,7 @@ const StockReceiving = ({ user, userData }) => {
                       color:
                         selectedButtonIndex.batchDetails === index
                           ? "blue"
-                          : "inherit", // Apply color separately
+                          : "inherit",
                     }}
                   />
                 </td>

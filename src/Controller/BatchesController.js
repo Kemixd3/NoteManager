@@ -1,12 +1,13 @@
 import axios from "axios";
-const baseUrl = "https://semesterapi.azurewebsites.net";
 const token = sessionStorage.getItem("token");
 
 async function fetchBatches(receivedGoodsId, siNumber) {
   console.log("fetchBatches", receivedGoodsId, siNumber);
   try {
     const response = await axios.get(
-      `${baseUrl}/batches/${receivedGoodsId}/${siNumber}`,
+      `${
+        import.meta.env.VITE_LOCALHOST
+      }/batches/${receivedGoodsId}/${siNumber}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -23,11 +24,14 @@ async function fetchBatches(receivedGoodsId, siNumber) {
 
 async function deleteBatch(batchId) {
   try {
-    await axios.delete(`${baseUrl}/batches/batches/${batchId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    await axios.delete(
+      `${import.meta.env.VITE_LOCALHOST}/batches/batches/${batchId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
   } catch (error) {
     console.error("Error deleting batch:", error.message);
     throw new Error("Failed to delete batch");
@@ -36,11 +40,15 @@ async function deleteBatch(batchId) {
 
 async function UpdateBatch(batchId, batchData) {
   try {
-    await axios.put(`${baseUrl}/batches/batches/${batchId}`, batchData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    await axios.put(
+      `${import.meta.env.VITE_LOCALHOST}/batches/batches/${batchId}`,
+      batchData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
   } catch (error) {
     console.error("Error updating batch:", error.message);
     throw new Error("Failed to update batch");

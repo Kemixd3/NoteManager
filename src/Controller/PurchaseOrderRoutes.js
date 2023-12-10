@@ -1,11 +1,11 @@
 const token = sessionStorage.getItem("token");
 import axios from "axios";
-const baseUrl = "https://semesterapi.azurewebsites.net";
+
 async function getPosts(org) {
   try {
     if (token && token !== "Bearer null") {
       const response = await axios.get(
-        `${baseUrl}/orders/purchase-orders?org=${org}`,
+        `${import.meta.env.VITE_LOCALHOST}/orders/purchase-orders?org=${org}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -15,12 +15,11 @@ async function getPosts(org) {
       );
       return response.data;
     } else {
-      // Return a resolved promise if the token is invalid or null
+      //Return a resolved promise i token is invalid or null
       return null;
     }
   } catch (error) {
     console.error("Error fetching posts:", error);
-    // Return a rejected promise in case of an error
     throw error;
   }
 }
@@ -28,7 +27,7 @@ async function getPosts(org) {
 async function fetchPurchaseOrderItems(id) {
   try {
     const response = await axios.get(
-      `${baseUrl}/orders/purchase-order-items/${id}`,
+      `${import.meta.env.VITE_LOCALHOST}/orders/purchase-order-items/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

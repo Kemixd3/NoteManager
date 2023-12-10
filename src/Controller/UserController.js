@@ -1,12 +1,11 @@
 import axios from "axios";
 const SecretToken = sessionStorage.getItem("token");
-const baseUrl = "https://semesterapi.azurewebsites.net";
 
 async function getUserFromEmail(email) {
   try {
     const storedToken = sessionStorage.getItem("token");
     const response = await axios.get(
-      `${baseUrl}/users/usersFromEmail/${email}`,
+      `${import.meta.env.VITE_LOCALHOST}/users/usersFromEmail/${email}`,
       {
         headers: {
           Authorization: `Bearer ${storedToken}`,
@@ -31,18 +30,21 @@ async function getUserFromEmail(email) {
 
 const updateProfile = async (id, username, email, avatar_url) => {
   try {
-    const response = await fetch(`${baseUrl}/users/users/${id}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${SecretToken}`, // Assuming user object contains a valid token
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: username,
-        email: email,
-        image: avatar_url,
-      }),
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_LOCALHOST}/users/users/${id}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${SecretToken}`, // Assuming user object contains a valid token
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: username,
+          email: email,
+          image: avatar_url,
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to update profile");

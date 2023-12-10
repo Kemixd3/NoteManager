@@ -1,10 +1,12 @@
 import axios from "axios";
+
 const token = sessionStorage.getItem("token");
-const baseUrl = "https://semesterapi.azurewebsites.net";
 async function fetchReceivedGoods(id, userOrg) {
   try {
     const response = await axios.get(
-      `${baseUrl}/receiving/received-goods/${id}/${userOrg}`,
+      `${
+        import.meta.env.VITE_LOCALHOST
+      }/receiving/received-goods/${id}/${userOrg}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -23,7 +25,7 @@ async function postReceivedGoods(id, userOrg) {
   try {
     const currentDate = new Date().toISOString().slice(0, 19).replace("T", " ");
     const response = await axios.post(
-      `${baseUrl}/receiving/received-goods`,
+      `${import.meta.env.VITE_LOCALHOST}/receiving/received-goods`,
       {
         received_date: currentDate,
         purchase_order_id: id,
@@ -50,7 +52,9 @@ async function postReceivedGoods(id, userOrg) {
 async function fetchReceivedGoodsItemsApi(batchId, siNumber) {
   try {
     const response = await axios.get(
-      `${baseUrl}/receiving/received_goods_items/${batchId}/${siNumber}`,
+      `${
+        import.meta.env.VITE_LOCALHOST
+      }/receiving/received_goods_items/${batchId}/${siNumber}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +71,9 @@ async function fetchReceivedGoodsItemsApi(batchId, siNumber) {
 async function deleteReceivingItemApi(line) {
   try {
     const response = await axios.delete(
-      `${baseUrl}/receiving/received_goods_items/${line}`,
+      `${
+        import.meta.env.VITE_LOCALHOST
+      }/receiving/received_goods_items/${line}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -94,7 +100,6 @@ async function submitReceivedGoods(
   formData,
   recievedGoodsData
 ) {
-  console.log(userData, "SHIT");
   try {
     let response;
     if (items && items.length > 0) {
@@ -105,7 +110,7 @@ async function submitReceivedGoods(
       };
 
       response = await axios.post(
-        baseUrl + "/receiving/received_goods_items",
+        import.meta.env.VITE_LOCALHOST + "/receiving/received_goods_items",
         requestBody,
         {
           headers: {
@@ -124,12 +129,16 @@ async function submitReceivedGoods(
         received_goods_received_goods_id: recievedGoodsData.received_goods_id,
       };
 
-      response = await axios.post(baseUrl + "/batches", batchData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      response = await axios.post(
+        import.meta.env.VITE_LOCALHOST + "/batches",
+        batchData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
     }
 
     if (response.status === 200 || response.status === 201) {
@@ -145,10 +154,48 @@ async function submitReceivedGoods(
   }
 }
 
+const updateReceivedGoodsItem = async (formData) => {
+  try {
+    const response = await axios.put(
+      `${import.meta.env.VITE_LOCALHOST}/receiving/received_goods_items/${
+        formData.received_item_id
+      }`,
+      {
+        Name: formData.Name,
+        Quantity: formData.Quantity,
+        SI_number: formData.SI_number,
+        createdBy: formData.createdBy,
+        QuantityPO: formData.QuantityPO,
+        received_goods_id: formData.received_goods_id,
+        received_item_id: formData.received_item_id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      const data = response.data;
+      console.log(data.message);
+      return data;
+    } else {
+      console.error("Error updating received goods item:", response.data.error);
+      throw new Error("Failed to update received goods item");
+    }
+  } catch (error) {
+    console.error("Error updating received goods item:", error.message);
+    throw error;
+  }
+};
+
 export {
   fetchReceivedGoods,
   postReceivedGoods,
   fetchReceivedGoodsItemsApi,
   deleteReceivingItemApi,
   submitReceivedGoods,
+  updateReceivedGoodsItem,
 };
