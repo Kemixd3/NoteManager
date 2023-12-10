@@ -1,7 +1,7 @@
 const trashIconStyle = {
   cursor: "pointer",
   color: "red",
-  transition: "color 0.3s ease", //transition
+  transition: "color 0.3s ease",
 };
 
 const defaultIconStyle = {
@@ -21,4 +21,26 @@ const tableCellStyle = {
   padding: "8px",
 };
 
-export { trashIconStyle, defaultIconStyle, tableHeaderStyle, tableCellStyle };
+const tableHeaderStyleSearch = {
+  border: "1px solid #ddd",
+  padding: "8px",
+  backgroundColor: "#f2f2f2",
+  textAlign: "center",
+  verticalAlign: "middle",
+};
+
+const tableCellStyleSearch = {
+  border: "1px solid #ddd",
+  padding: "8px",
+  textAlign: "center",
+  verticalAlign: "middle",
+};
+
+export {
+  trashIconStyle,
+  defaultIconStyle,
+  tableHeaderStyle,
+  tableCellStyle,
+  tableHeaderStyleSearch,
+  tableCellStyleSearch,
+};
