@@ -9,7 +9,7 @@ export default defineConfig(({ command }) => {
   };
 
   if (command !== "serve") {
-    config.base = "/react-vite-crud-app-cloud-storage/";
+    config.base = "/";
   }
 
   return config;

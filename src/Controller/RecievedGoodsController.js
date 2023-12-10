@@ -1,6 +1,6 @@
 import axios from "axios";
 const token = sessionStorage.getItem("token");
-const baseUrl = "http://localhost:3001";
+const baseUrl = "https://semesterapi.azurewebsites.net";
 async function fetchReceivedGoods(id, userOrg) {
   try {
     const response = await axios.get(
