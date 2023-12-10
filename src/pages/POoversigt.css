@@ -72,3 +72,15 @@ li:hover {
 .darkmode .css-13xy2my {
   background-color: #18191a !important;
 }
+
+.darkmode
+  .MuiTableCell-root
+  .MuiTableCell-body
+  .MuiTableCell-alignRight
+  .MuiTableCell-sizeMedium
+  .css-1i36psw {
+  color: #b0b3b8 !important;
+}
+.darkmode .MuiTableCell-root .MuiTableCell-body {
+  color: #b0b3b8 !important;
+}
