@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { updateProfile } from "../Controller/UserController";
 import "./Account.css";
+import { useAuth } from "../Context/AuthContext";
 
-const Account = ({ user, userData }) => {
+const Account = ({ userData }) => {
+  const { logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
@@ -54,14 +56,6 @@ const Account = ({ user, userData }) => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      console.log("need logout function");
-    } catch (error) {
-      alert("awddawdawd", error.message);
-    }
-  };
-
   return (
     <div aria-live="polite" id="accountForm">
       {loading ? (
@@ -109,11 +103,7 @@ const Account = ({ user, userData }) => {
             >
               Update profile
             </button>
-            <button
-              onClick={handleLogout}
-              type="submit"
-              className="button secondary"
-            >
+            <button onClick={logout} type="submit" className="button secondary">
               Logout
             </button>
           </div>
