@@ -15,14 +15,12 @@ export const AuthProvider = ({ children }) => {
     onSuccess: (codeResponse) => {
       setUser(codeResponse);
       setToken("Initial");
-
-      // Store the token or relevant user data as needed
     },
     onError: (error) => console.log("Login Failed:", error),
   });
 
   useEffect(() => {
-    // Check if the user is not logged in, then initiate automatic login
+    //Check if user is not logged in, then initiate automatic login
     if (!user) {
       login();
     }
@@ -32,14 +30,12 @@ export const AuthProvider = ({ children }) => {
     googleLogout();
     setUser(null);
     setUserData(null);
-    sessionStorage.removeItem("user");
     sessionStorage.removeItem("userData");
+    sessionStorage.removeItem("user");
     sessionStorage.removeItem("token");
   };
 
   useEffect(() => {
-    console.log(user, "what is user?");
-
     if (user) {
       axios
         .get(
@@ -52,9 +48,9 @@ export const AuthProvider = ({ children }) => {
           }
         )
         .then((res) => {
-          console.log(res.data, "OMG WORKS");
-
-          setUser(res.data);
+          if (res.data && res.data.email) {
+            setUser(res.data);
+          }
         })
         .catch((err) => console.log(err));
     }
@@ -62,34 +58,26 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      try {
-        if (user && user.email) {
-          setIsLoadingUser(true);
-
-          const response = await getUserFromEmail(user.email);
-
-          if (response) {
-            setUserData(response);
-          } else {
-            await axios.post("http://localhost:3001/users/post", {
-              userid: user.uid,
-              name: "",
-              email: user.email,
-              image:
-                "https://media.licdn.com/dms/image/C560BAQHuF4hk-oVm4w/company-logo_200_200/0/1630637919310/uav_components_aps_logo?e=2147483647&v=beta&t=QrkJiLZuMdpNdWvF2jCSGUJZyUs-nrqfsHvXfQJZkrM",
-            });
-          }
+      if (user && user.email) {
+        setIsLoadingUser(true);
+        //getting user or checking of token is still valid
+        const response = await getUserFromEmail(user.email);
+        if (response) {
+          setUserData(response);
+          setIsLoadingUser(false);
+        } else if (user.email) {
+          setToken("Rerun");
+        } else {
+          setIsLoadingUser(false);
+          console.log("Access denied");
         }
-      } catch (error) {
-        alert(error.message);
-      } finally {
-        setIsLoadingUser(false);
       }
     };
 
     fetchUserData();
   }, [user, token]);
 
+  //Setting user and userdata ref (Bad store alternative)
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     const storedUserData = sessionStorage.getItem("userData");
@@ -100,8 +88,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    window.sessionStorage.setItem("user", JSON.stringify(user));
-    window.sessionStorage.setItem("userData", JSON.stringify(userData));
+    //Setting the initial usedata in session storage
+    const CurrentUser = sessionStorage.getItem("user");
+    const CurrentUserData = sessionStorage.getItem("userData");
+    if (user && user.email && !CurrentUser) {
+      window.sessionStorage.setItem("user", JSON.stringify(user));
+    } else if (user && !user.email) {
+      setToken("Rerun");
+    }
+    if (userData && !CurrentUserData) {
+      window.sessionStorage.setItem("userData", JSON.stringify(userData));
+    }
   }, [user, userData]);
 
   return (

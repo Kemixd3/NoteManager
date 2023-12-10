@@ -1,6 +1,6 @@
 import Router from "../router";
 import NavbarDisplay from "./Nav";
-
+import SignInButton from "./SignInButton";
 import { useAuth } from "../Context/AuthContext";
 import { useEffect } from "react";
 
@@ -31,7 +31,7 @@ function AuthenticatedView() {
           <Router />
         </div>
       ) : (
-        <button onClick={login}>Sign in</button>
+        <SignInButton />
       )}
     </div>
   );
