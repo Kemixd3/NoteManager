@@ -27,39 +27,41 @@ export default function HomePage({ userData }) {
   }, [userData, user]);
 
   useEffect(() => {
-    gantt.init("gantt-container");
-    gantt.plugins({
-      marker: true,
-    });
+    if (posts.length > 0) {
+      gantt.init("gantt-container");
+      gantt.plugins({
+        marker: true,
+      });
 
-    const ganttData = posts.map((post) => ({
-      id: post.order_id,
-      text: `Order ${post.order_id} - ${post.Buyer}`,
-      start_date: new Date(post.order_date),
-      end_date: new Date(post.expected_arrival),
-    }));
+      const ganttData = posts.map((post) => ({
+        id: post.order_id,
+        text: `Order ${post.order_id} - ${post.Buyer}`,
+        start_date: new Date(post.order_date),
+        end_date: new Date(post.expected_arrival),
+      }));
 
-    var dateToStr = gantt.date.date_to_str(gantt.config.task_date);
-    var markerId = gantt.addMarker({
-      start_date: new Date(), //a Date object that sets the markers date
-      css: "today", //a CSS class applied to the marker
-      text: "Now", //the marker title
-      title: dateToStr(new Date()), //the markers tooltip
-    });
+      var dateToStr = gantt.date.date_to_str(gantt.config.task_date);
+      var markerId = gantt.addMarker({
+        start_date: new Date(), //a Date object that sets the markers date
+        css: "today", //a CSS class applied to the marker
+        text: "Now", //the marker title
+        title: dateToStr(new Date()), //the markers tooltip
+      });
 
-    // Load data into the gantt chart
-    gantt.parse({ data: ganttData });
-    gantt.getMarker(markerId);
-    //Attach event handler for task click
-    gantt.attachEvent("onTaskClick", (id, e) => {
-      e.preventDefault();
+      // Load data into the gantt chart
+      gantt.parse({ data: ganttData });
+      gantt.getMarker(markerId);
+      //Attach event handler for task click
+      gantt.attachEvent("onTaskClick", (id, e) => {
+        e.preventDefault();
 
-      //Get the order_id from the clicked task
-      const clickedOrderId = id.toString(); // Convert to string
+        //Get order_id from the clicked task as string
+        const clickedOrderId = id.toString();
 
-      //Navigate to /scan/order.id
-      navigate(`/scan/${clickedOrderId}`);
-    });
+        //Navigate to /scan/order.id when its clicked in the gantt
+        navigate(`/scan/${clickedOrderId}`);
+      });
+    }
   }, [posts, navigate]);
 
   return (

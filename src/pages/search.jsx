@@ -1,80 +1,7 @@
 import { useState } from "react";
 import "../App.scss";
 import { fetchData } from "../Controller/StockDbController";
-import {
-  tableHeaderStyleSearch,
-  tableCellStyleSearch,
-} from "../store/cssStore";
-const SearchResultTable = ({ searchData, selectedCategory }) => {
-  const categoryMetadata = {
-    po: [
-      "Buyer",
-      "Organization",
-      "expected_arrival",
-      "notes",
-      "order_date",
-      "order_id",
-    ],
-    batch: [
-      "batch_id",
-      "batch_name",
-      "createdBy",
-      "received_date",
-      "received_goods_received_goods_id",
-      "si_number",
-    ],
-
-    receivedItems: [
-      "Name",
-      "Quantity",
-      "SI_number",
-      "createdBy",
-      "is_batch",
-      "received_goods_id",
-      "received_item_id",
-    ],
-
-    material: [
-      "Organization",
-      "item_id",
-      "item_name",
-      "item_type",
-      "quantity",
-      "received_date",
-    ],
-    poi: ["Name", "Quantity", "SI_number", "item_id", "item_type", "order_id"],
-  };
-
-  const headers = categoryMetadata[selectedCategory];
-
-  return (
-    <div className="searchForm">
-      <table className="">
-        <thead>
-          <tr>
-            {headers.map((header, index) => (
-              <th key={index} style={tableHeaderStyleSearch}>
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {searchData &&
-            searchData.map((item, index) => (
-              <tr key={index}>
-                {headers.map((header, columnIndex) => (
-                  <td key={columnIndex} style={tableCellStyleSearch}>
-                    {item[header]}
-                  </td>
-                ))}
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+import SearchResultTable from "../components/SearchResultTable";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -95,6 +22,7 @@ const Search = () => {
     event.preventDefault();
     try {
       const response = await fetchData(searchTerm, selectedCategory);
+
       setSearchData(response);
     } catch (error) {
       console.log("No Results");
