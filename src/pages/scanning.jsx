@@ -60,10 +60,12 @@ const StockReceiving = ({ userData }) => {
       const receivedData = receivedGoods;
 
       if (receivedData) {
+        console.log("WOOOOOOOOOOOOOOOOOOOOOOO");
         setReceivedGoods(receivedData.receivedGoods);
         setReceivedGoodsId(receivedData.receivedGoods[0].received_goods_id);
         setPosts(postsData.purchaseOrderItems);
       } else {
+        console.log("WHAAAAAAAAAAAAAAAAAAAAAAA");
         const success = await postReceivedGoods(id, userData.Organization);
         if (success) {
           //Rerun the useffect
@@ -458,8 +460,8 @@ const StockReceiving = ({ userData }) => {
           }}
         >
           {Object.keys(selectedBatch).length !== 0
-            ? "Save Batch"
-            : "Submit Batch"}
+            ? "Save changes to batch"
+            : "Create Batch"}
         </button>
       </div>
     </div>
