@@ -36,7 +36,6 @@ const Account = ({ userData }) => {
 
   const updateUserProfile = async (e) => {
     e.preventDefault();
-    console.log(userData);
     try {
       setLoading(true);
       const updatedUser = await updateProfile(

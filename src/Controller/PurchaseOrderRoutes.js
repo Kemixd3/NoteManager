@@ -1,7 +1,7 @@
 const token = sessionStorage.getItem("token");
 import axios from "axios";
 
-async function getPosts(org) {
+async function getPosts(org, token) {
   try {
     if (token && token !== "Bearer null") {
       const response = await axios.get(

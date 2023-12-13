@@ -22,19 +22,17 @@ import {
 import { fetchBatches, deleteBatch } from "../Controller/BatchesController";
 import { fetchPurchaseOrderItems } from "../Controller/PurchaseOrderRoutes";
 
-const StockReceiving = ({ user, userData }) => {
+const StockReceiving = ({ userData }) => {
   const [selected, setSelected] = useState([]);
   const [batches, setAllBatches] = useState([]);
-  const [editableItems, setEditableItems] = useState([]);
-  const [editedValues, setEditedValues] = useState({});
-  const [batch, setBatchGoods] = useState([]);
+  const [recieved_goods_items, setBatchGoods] = useState([]);
   const [filteredBatches, setFilteredBatches] = useState([]);
   const [posts, setPosts] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState({});
   const [receivedGoodsData, setReceivedGoods] = useState([]);
   const [reload, ReloadOrders] = useState([]);
   const { id } = useParams(); //Get PO ID from the route
-  const [userId, setUserId] = useState(userData.userid);
+  const userId = userData.userid;
   const [scannedBarcode, setScannedBarcode] = useState("");
   const [EditItem, setEditItem] = useState(null);
   const [EditBatch, setEditBatch] = useState(null);
@@ -135,17 +133,6 @@ const StockReceiving = ({ user, userData }) => {
     }
   };
 
-  const handleInputChange = (event, item) => {
-    const { name, value } = event.target;
-    setEditedValues((prevValues) => ({
-      ...prevValues,
-      [item.id]: {
-        ...prevValues[item.id],
-        [name]: value,
-      },
-    }));
-  };
-
   const addLine = (barcodeValue, quantityValue) => {
     if (
       selectedBatch.si_number &&
@@ -154,7 +141,7 @@ const StockReceiving = ({ user, userData }) => {
       receivedGoodsData[0].received_goods_id
     ) {
       setBatchGoods([
-        ...batch,
+        ...recieved_goods_items,
         {
           Name: barcodeValue,
           Quantity: quantityValue || 1,
@@ -229,6 +216,7 @@ const StockReceiving = ({ user, userData }) => {
   const handleCloseItemDialog = () => {
     setItemDialogOpen(false);
     setEditItem(null);
+    fetchReceivedGoodsItems(selectedBatch.batch_id, selectedBatch.si_number);
   };
   const handleBatchDelete = async (batchId) => {
     await deleteBatch(batchId)
@@ -255,19 +243,27 @@ const StockReceiving = ({ user, userData }) => {
     getBatches(receivedGoodsData[0].received_goods_id, selected.SI_number);
   };
 
-  async function deleteReceivingItem(line) {
-    await deleteReceivingItemApi(line)
-      .then((isDeleted) => {
-        if (isDeleted) {
-          fetchReceivedGoodsItems(
-            selectedBatch.batch_id,
-            selectedBatch.si_number
-          );
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  async function deleteReceivingItem(line, index) {
+    if (!line && index >= 0 && index < recieved_goods_items.length) {
+      //Slice the array into two parts (above and below elements index)
+      const itemsAboveIndex = recieved_goods_items.slice(0, index); //before
+      const itemsBelowIndex = recieved_goods_items.slice(index + 1); //after
+      const updatedBatch = itemsAboveIndex.concat(itemsBelowIndex); //Combine arrays to create updated array
+      setBatchGoods(updatedBatch);
+    } else {
+      await deleteReceivingItemApi(line)
+        .then((isDeleted) => {
+          if (isDeleted) {
+            fetchReceivedGoodsItems(
+              selectedBatch.batch_id,
+              selectedBatch.si_number
+            );
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }
 
   return (
@@ -319,7 +315,7 @@ const StockReceiving = ({ user, userData }) => {
             handleCloseDialog={handleCloseDialog}
             recieved_goods={receivedGoodsData}
             userData={userId}
-            items={batch}
+            items={recieved_goods_items}
             selectedBatch={selectedBatch}
           />
         )}
@@ -355,20 +351,7 @@ const StockReceiving = ({ user, userData }) => {
             {filteredBatches.map((item, index) => (
               <tr key={index}>
                 <td style={tableCellStyle}>{index + 1}</td>
-                <td style={tableCellStyle}>
-                  {editableItems.includes(item) ? (
-                    <input
-                      type="text"
-                      name="batch_name"
-                      value={
-                        editedValues[item.id]?.batch_name || item.batch_name
-                      }
-                      onChange={(event) => handleInputChange(event, item)}
-                    />
-                  ) : (
-                    item.batch_name
-                  )}
-                </td>
+                <td style={tableCellStyle}>{item.batch_name}</td>
                 <td style={tableCellStyle}>{item.createdBy}</td>
 
                 <td style={tableCellStyle}>{item.si_number}</td>
@@ -440,7 +423,7 @@ const StockReceiving = ({ user, userData }) => {
               </tr>
             </thead>
             <tbody>
-              {batch.map((item, index) => (
+              {recieved_goods_items.map((item, index) => (
                 <tr key={index}>
                   <td style={tableCellStyle}>{index + 1}</td>
                   <td style={tableCellStyle}>{item.Name}</td>
@@ -460,7 +443,7 @@ const StockReceiving = ({ user, userData }) => {
                       size={33}
                       style={trashIconStyle}
                       onClick={() => {
-                        deleteReceivingItem(item.received_item_id);
+                        deleteReceivingItem(item.received_item_id, index);
                       }}
                     />
                   </td>

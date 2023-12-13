@@ -2,21 +2,20 @@ import { useState, useEffect } from "react";
 import "dhtmlx-gantt";
 import { getPosts } from "../Controller/PurchaseOrderRoutes";
 import "dhtmlx-gantt/codebase/skins/dhtmlxgantt_contrast_white.css";
-import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./home.css";
 
 export default function HomePage({ userData }) {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const token = sessionStorage.getItem("token");
   document.title = "Home";
 
   useEffect(() => {
-    if (userData && userData.Organization) {
+    if (userData && userData.Organization && token) {
       const fetchData = async () => {
         try {
-          const data = await getPosts(userData.Organization);
+          const data = await getPosts(userData.Organization, token);
           setPosts(data);
         } catch (error) {
           console.error(error);
@@ -24,10 +23,10 @@ export default function HomePage({ userData }) {
       };
       fetchData();
     }
-  }, [userData, user]);
+  }, [token]);
 
   useEffect(() => {
-    if (posts.length > 0) {
+    if (posts?.length > 0) {
       gantt.init("gantt-container");
       gantt.plugins({
         marker: true,
@@ -62,7 +61,7 @@ export default function HomePage({ userData }) {
         navigate(`/scan/${clickedOrderId}`);
       });
     }
-  }, [posts, navigate]);
+  }, [posts]);
 
   return (
     <section className="page">

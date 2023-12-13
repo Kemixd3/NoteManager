@@ -19,7 +19,6 @@ const ScanForm = ({ addLine }) => {
   }, [addLine]);
 
   const onSubmit = (data) => {
-    console.log(data);
     addLine(data.scannedBarcode, data.quantity); //Emit addLine with scanned barcode and quantity values
     reset(); //Reset form after submission
   };
