@@ -59,12 +59,12 @@ const StockReceiving = ({ userData }) => {
       const postsData = postsResponse;
       const receivedData = receivedGoods;
 
-      if (!receivedData.message) {
+      if (receivedData) {
         setReceivedGoods(receivedData.receivedGoods);
         setReceivedGoodsId(receivedData.receivedGoods[0].received_goods_id);
         setPosts(postsData.purchaseOrderItems);
       } else {
-        const success = await postReceivedGoods(id, userData.userOrg);
+        const success = await postReceivedGoods(id, userData.Organization);
         if (success) {
           //Rerun the useffect
           ReloadOrders([]);

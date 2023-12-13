@@ -17,7 +17,7 @@ async function fetchReceivedGoods(id, userOrg) {
     return response.data;
   } catch (error) {
     console.error("Error fetching received goods:", error);
-    throw new Error("Failed to fetch received goods");
+    return null;
   }
 }
 
