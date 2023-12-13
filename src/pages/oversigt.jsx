@@ -48,16 +48,18 @@ const POOversigt = (userData) => {
       <h2>Order Details</h2>
       <Table sx={{ minWidth: 700 }} aria-label="spanning table">
         <TableHead>
-          <TableCell align="right">
-            <strong>Order ID</strong>
-          </TableCell>
-          <TableCell align="right">
-            <strong>Ordered By</strong>
-          </TableCell>
-          <TableCell align="right">
-            <strong>Notes</strong>
-          </TableCell>
-          <TableCell align="right"></TableCell>
+          <TableRow>
+            <TableCell align="right">
+              <strong>Order ID</strong>
+            </TableCell>
+            <TableCell align="right">
+              <strong>Ordered By</strong>
+            </TableCell>
+            <TableCell align="right">
+              <strong>Notes</strong>
+            </TableCell>
+            <TableCell align="right"></TableCell>
+          </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row, index) => (

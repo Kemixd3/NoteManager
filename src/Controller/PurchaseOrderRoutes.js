@@ -1,14 +1,18 @@
-const token = sessionStorage.getItem("token");
+const token2 = sessionStorage.getItem("token");
 import axios from "axios";
 
 async function getPosts(org, token) {
   try {
-    if (token && token !== "Bearer null") {
+    if (
+      token ||
+      (token2 && token !== "Bearer null") ||
+      token2 !== "Bearer null"
+    ) {
       const response = await axios.get(
         `${import.meta.env.VITE_LOCALHOST}/orders/purchase-orders?org=${org}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token || token2}`,
             Accept: "application/json",
           },
         }
@@ -30,7 +34,7 @@ async function fetchPurchaseOrderItems(id) {
       `${import.meta.env.VITE_LOCALHOST}/orders/purchase-order-items/${id}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token2}`,
           Accept: "application/json",
         },
       }

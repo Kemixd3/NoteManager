@@ -8,7 +8,7 @@ const SearchResultTable = ({ searchData, selectedCategory }) => {
     po: ["Order", "Ordered_By", "Ordered", "Expected_Arrival", "Notes"],
     batch: [
       "Batch_ID",
-      "Name",
+      "Batch_Name",
       "Created_By",
       "Received",
       "Receival_ID",
