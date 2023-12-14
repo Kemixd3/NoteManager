@@ -120,7 +120,6 @@ async function submitReceivedGoods(
           },
         }
       );
-      return response;
     } else {
       const currentDate = new Date().toISOString().split("T")[0];
       const batchData = {

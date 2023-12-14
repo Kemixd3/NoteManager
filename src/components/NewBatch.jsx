@@ -30,7 +30,12 @@ export default function BatchDialog({
   const handleSubmit = async (e) => {
     e.preventDefault();
     let response;
-    try {
+
+    const aboveLimitItems = items.filter(
+      (item) => item.Quantity > formQuantityLimit
+    );
+
+    if (!(aboveLimitItems.length > 0)) {
       response = await submitReceivedGoods(
         items,
         selectedBatch,
@@ -39,12 +44,22 @@ export default function BatchDialog({
         recievedGoodsData
       );
 
-      if (response.data.error) {
-        setWarning(response.data.error);
+      if (
+        response &&
+        response.error &&
+        response.error.response &&
+        response.error.response.data &&
+        response.error.response.data.error &&
+        response.error.response.data.error.length > 0
+      ) {
+        setWarning(response.error.response.data.error);
+      } else {
+        handleCloseDialog();
       }
-      //handleCloseDialog();
-    } catch (error) {
-      setWarning(response.error.response.data.error);
+    } else {
+      setWarning(
+        "Only " + formQuantityLimit + " has been ordered and can be received"
+      );
     }
   };
 
@@ -67,7 +82,7 @@ export default function BatchDialog({
       <dialog className="dialog" open>
         {warning && (
           <Alert variant="filled" severity="warning" color="info">
-            {warning + " already received"}
+            {warning}
           </Alert>
         )}
 

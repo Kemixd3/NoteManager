@@ -110,6 +110,7 @@ const StockReceiving = ({ userData }) => {
       })
       .catch((error) => {
         console.error(error);
+        setBatchGoods([]);
       });
   };
 
