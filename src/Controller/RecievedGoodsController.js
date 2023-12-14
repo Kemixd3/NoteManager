@@ -107,6 +107,7 @@ async function submitReceivedGoods(
       const requestBody = {
         batch_id: selectedBatch.batch_id,
         receivedGoodsItems: filteredItems,
+        purchase_order_id: recievedGoodsData.purchase_order_id,
       };
 
       response = await axios.post(
@@ -154,7 +155,7 @@ async function submitReceivedGoods(
   }
 }
 
-const updateReceivedGoodsItem = async (formData) => {
+const updateReceivedGoodsItem = async (formData, purchase_order_id) => {
   try {
     const response = await axios.put(
       `${import.meta.env.VITE_LOCALHOST}/receiving/received_goods_items/${
@@ -168,6 +169,7 @@ const updateReceivedGoodsItem = async (formData) => {
         QuantityPO: formData.QuantityPO,
         received_goods_id: formData.received_goods_id,
         received_item_id: formData.received_item_id,
+        purchase_order_id: purchase_order_id,
       },
       {
         headers: {

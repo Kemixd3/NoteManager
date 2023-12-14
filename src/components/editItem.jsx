@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import "./NewBatch.css";
 import { updateReceivedGoodsItem } from "../Controller/RecievedGoodsController";
 
-export default function EditDialog({ edit, handleCloseDialog }) {
+export default function EditDialog({
+  edit,
+  handleCloseDialog,
+  recieved_goods,
+}) {
   const [formData, setFormData] = useState({
     Name: edit.Name,
     Quantity: edit.Quantity,
@@ -18,13 +22,16 @@ export default function EditDialog({ edit, handleCloseDialog }) {
     if (recievedGoodsData) {
       setRecievedGoods(recievedGoodsData[0]);
     }
-  }, [edit.Name, edit.Quantity, edit.SI_number, edit.createdBy]);
+  }, [edit.Name]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await updateReceivedGoodsItem(formData);
+      await updateReceivedGoodsItem(
+        formData,
+        recieved_goods[0].purchase_order_id
+      );
 
       handleCloseDialog();
     } catch (error) {
