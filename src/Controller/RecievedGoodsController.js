@@ -120,6 +120,7 @@ async function submitReceivedGoods(
           },
         }
       );
+      return response;
     } else {
       const currentDate = new Date().toISOString().split("T")[0];
       const batchData = {
@@ -151,7 +152,7 @@ async function submitReceivedGoods(
     }
   } catch (error) {
     console.error("Error adding/retrieving data:", error.message);
-    throw new Error("Failed to add/retrieve data");
+    return { error: error };
   }
 }
 

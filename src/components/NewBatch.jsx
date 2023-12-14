@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "./NewBatch.css";
 import { submitReceivedGoods } from "../Controller/RecievedGoodsController";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 
 export default function BatchDialog({
   selectedItem,
@@ -13,6 +15,7 @@ export default function BatchDialog({
   const [recievedGoodsData, setRecievedGoods] = useState([]);
   const [formData, setFormData] = useState({});
   const [formQuantityLimit, setQuantity] = useState(selectedItem.Quantity);
+  const [warning, setWarning] = useState();
 
   useEffect(() => {
     //populate form
@@ -26,21 +29,23 @@ export default function BatchDialog({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let response;
+    try {
+      response = await submitReceivedGoods(
+        items,
+        selectedBatch,
+        userData,
+        formData,
+        recievedGoodsData
+      );
 
-    await submitReceivedGoods(
-      items,
-      selectedBatch,
-      userData,
-      formData,
-      recievedGoodsData
-    )
-      .then((data) => {
-        console.log(data, "Submitted");
-        handleCloseDialog();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      if (response.data.error) {
+        setWarning(response.data.error);
+      }
+      //handleCloseDialog();
+    } catch (error) {
+      setWarning(response.error.response.data.error);
+    }
   };
 
   const validateQuantityChange = (e) => {
@@ -60,6 +65,12 @@ export default function BatchDialog({
   return (
     <div className="backdrop">
       <dialog className="dialog" open>
+        {warning && (
+          <Alert variant="filled" severity="warning" color="info">
+            {warning + " already received"}
+          </Alert>
+        )}
+
         {items && items.length > 0 ? (
           <div>
             <h4>Adding materials to batch</h4>
