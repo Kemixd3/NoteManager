@@ -31,6 +31,8 @@ Replace `<our_Google_OAuth2_Client_ID>` with your OAuth client ID and `<Your_Exp
 - **Build**: "npm run build" or vite build
 - **Linting**: "npm run lint"
 
+Before starting the app locally, remember to start the local backend api instance first: [Link to backend repository](https://github.com/Kemixd3/NoteManagerAPI)
+
 ### Database Setup (if applicable)
 
 The application uses a MySQL database and relies on the following tables:
