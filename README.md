@@ -44,7 +44,7 @@ The application uses a MySQL database and relies on the following tables:
 - `received_goods_items`
 - `users`
 
-For testing purposes, we have provided a backup download of the database with test data from [this link](your-database-backup-link-here). Import this database backup into your MySQL server to have the necessary tables and sample data for your local setup or hosted instance.
+For testing purposes, we have provided a backup download of the database in csv with test data from [this link](https://drive.google.com/drive/folders/14VX91a7UVgOucWiKCjmUPG_utUMr8zHD?usp=sharing). Import this database backup into your MySQL server using import wizard to have the necessary tables and sample data for your local setup or hosted instance. Dont forget to also add your users into the users data table so you can access the protected backend endpoints.
 
 Ensure the database connection details in your application match the configuration of your local MySQL server to interact with the database.
 
