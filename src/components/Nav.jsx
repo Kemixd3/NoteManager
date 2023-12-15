@@ -1,6 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState, useEffect } from "react";
 import Navbar from "react-bootstrap/Navbar";
+import SignInButton from "./SignInButton";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { useAuth } from "../Context/AuthContext";
@@ -54,7 +55,7 @@ function NavbarDisplay({ user, userData }) {
               </Nav>
             ) : (
               <Nav>
-                <Nav.Link href="#login">Sign In</Nav.Link>
+                <SignInButton />
               </Nav>
             )}
           </Navbar.Collapse>
